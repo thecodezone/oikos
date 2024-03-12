@@ -10,12 +10,12 @@ export default function PrayerForm() {
   let [name, setName] = React.useState('');
   let [submitted, setSubmitted] = React.useState(null);
 
-  let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  let onSubmit = () => {
     // Prevent default browser page refresh.
-    e.preventDefault();
+   // e.preventDefault();
 
     // Get form data as an object.
-    let data = Object.fromEntries(new FormData(e.currentTarget));
+    //let data = Object.fromEntries(new FormData(e.currentTarget));
 
     // Submit to your backend API...
     //setSubmitted(data);
