@@ -1,6 +1,7 @@
 import './App.css';
-import GraphView from './components/graph';
-import PrayerForm from './Form.tsx';
+import PrayerMap from './components/graph';
+import IndividualPrayerForm from './AddPersonForm.tsx';
+import OrgPrayerForm from './AddOrgForm.tsx';
 import { Header } from './Header';
 
 function App() {
@@ -8,8 +9,7 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <GraphView />
-      <PrayerForm />
+      <PrayerMap />
     </div>
   );
 }

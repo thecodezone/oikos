@@ -5,17 +5,18 @@ import {Link, Form, ToggleButton, ActionButton,  Content, Dialog, DialogTrigger}
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
 import {ToastContainer, ToastQueue} from '@react-spectrum/toast'
 import {Input, Label, Modal, FieldError, OverlayArrow, Popover} from 'react-aria-components';
+import {addPerson} from './components/graph';
 
-export default function PrayerForm() {
+export default function IndividualPrayerForm() {
   let [name, setName] = React.useState('');
   let [submitted, setSubmitted] = React.useState(null);
 
-  let onSubmit = () => {
+  let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default browser page refresh.
-   // e.preventDefault();
+    e.preventDefault();
 
     // Get form data as an object.
-    //let data = Object.fromEntries(new FormData(e.currentTarget));
+    let data = Object.fromEntries(new FormData(e.currentTarget));
 
     // Submit to your backend API...
     //setSubmitted(data);
@@ -25,7 +26,7 @@ export default function PrayerForm() {
     <Provider theme={defaultTheme}>
       <ToastContainer />
       <DialogTrigger isDismissable mobileType='tray'>
-        <ActionButton>Pray for Someone</ActionButton>
+        <ActionButton>Add a Person</ActionButton>
         {( close ) => (
           <Dialog size="S">
           <Heading>Pray for Someone</Heading>
@@ -47,7 +48,7 @@ export default function PrayerForm() {
                 <Checkbox name="reminder">Add Prayer Reminder?</Checkbox>
                 <p></p>
                 <ButtonGroup>
-                <Button type="submit" variant="accent" onPress={() => ToastQueue.positive(name + ' successfully added to map', {timeout:1500})}>Add to map</Button>
+                <Button type="submit" variant="accent" onPress={() => {ToastQueue.positive(name + ' successfully added to map', {timeout:1500}); addPerson(name, 15, null, null); close()}}>Add to map</Button>
                 <Button type="reset" variant="primary" onPress={close}>Cancel</Button>
                   <DialogTrigger isDismissable type="popover">
                     <Button variant="secondary">ⓘ</Button>
@@ -68,9 +69,6 @@ export default function PrayerForm() {
           </Dialog>
         )}
       </DialogTrigger>
-      {submitted && (
-      <div>Form results: <code>{JSON.stringify(submitted)}</code>
-      </div>)}
     </Provider>
   );
 }
