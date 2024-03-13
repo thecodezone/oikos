@@ -32,15 +32,11 @@ export default function PrayerForm() {
             <Content>
               <Form validationBehavior="native" onSubmit={onSubmit} id="prayer-form">
                 <p></p>
-                <TextField name="name" value={name} onChange={setName} label="Subject Name" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+                <TextField name="name" value={name} onChange={setName} label="Organization Name" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <TextField name="phone" label="Phone Number" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+                <TextField name="description" label="Description of Organization" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <RadioGroup name="status" label="Subject Status" isRequired necessityIndicator='icon'>
-                  <Radio value="believer">Believer</Radio>
-                  <Radio value="seeker">Seeker</Radio>
-                  <FieldError/>
-                </RadioGroup>
+                <TextField name="website" label="Website Link/Contact Information" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
                 <TextArea name="request" label="Prayer Request"  width="size-3000" maxWidth="100%" necessityIndicator="label" placeholder="Enter request here..."/>
                 <p></p>
@@ -58,7 +54,7 @@ export default function PrayerForm() {
                         </Header>
                         <Divider/>
                         <Content>
-                        <Text>Enter the name and information for the person you would like to pray for using the dialog.</Text>
+                        <Text>Enter the name and information for the organization/church you would like to pray for using the dialog.</Text>
                         </Content>
                     </Dialog>
                   </DialogTrigger>

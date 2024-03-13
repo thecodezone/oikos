@@ -44,13 +44,9 @@ export default function PrayerForm() {
               <p></p>
               <TextField label="Subject Name" isRequired necessityIndicator="label" labelPosition="top" width="size-3000" placeholder="Joe Brown" value={formData.name} onChange={handleChange}/>
               <p></p>
-              <TextField label="Location" isRequired necessityIndicator="label" labelPosition="top" width="size-3000" placeholder="Canada" value={formData.location} onChange={handleChange}/>
+              <TextField label="Description of Organization" isRequired necessityIndicator="label" labelPosition="top" width="size-3000" placeholder="Church that went to as kid" value={formData.description} onChange={handleChange}/>
               <p></p>
-              <RadioGroup name="status" label="Subject Status" isRequired necessityIndicator='label'>
-                <Radio value="believer">Believer</Radio>
-                <Radio value="non-believer">Non-Believer</Radio>
-                <FieldError />
-              </RadioGroup>
+              <TextField label="Website Link/Contact Information" isRequired necessityIndicator="label" labelPosition="top" width="size-3000" placeholder="https://randomChurch.org" value={formData.website} onChange={handleChange}/>
               <p></p>
               <TextArea label="Prayer Request" name="content" width='1000' necessityIndicator="label" placeholder="Enter request here..." value={formData.request} onChange={handleChange}/>
               <p></p>
