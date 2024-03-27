@@ -9,6 +9,8 @@ function App() {
   return (
     <div className="App">
       <Header />
+      <IndividualPrayerForm />
+      <OrgPrayerForm />
       <PrayerMap />
     </div>
   );
