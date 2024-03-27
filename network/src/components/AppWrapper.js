@@ -36,8 +36,15 @@ export const AppWrapper = ({children}) => {
         setNodes(arrayCopy);
     };
 
+    const addEdge = () => {
+        const newEdge = {from: 1, to: 10};
+        const arrayCopy = [...edges];
+        arrayCopy.push(newEdge);
+        setEdges(arrayCopy);
+    }
+
     return (
-        <AppContext.Provider value = {{nodes, edges, addPerson}}>
+        <AppContext.Provider value = {{nodes, edges, addPerson, addEdge}}>
             {children}
         </AppContext.Provider>
     )
