@@ -8,10 +8,6 @@ export default function GraphView() {
     var data = {nodes: nodes, edges: edges}
     return (
         <>
-        <button className="addEdgeButton">
-            add Link
-        </button>
-
         <div className='container'>
             <Graph
                 graph = {data}

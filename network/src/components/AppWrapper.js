@@ -1,11 +1,11 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
 
 export const AppWrapper = ({children}) => {
     const [nodes, setNodes] = useState([
-        {id: 1, label: "Jayden", shape: "circle", button: true},
+        {id: 1, label: "Jayden", shape: "circle", name: "Jayden"},
         {id: 2, label: "Ryan", shape: "box"},
         {id: 3, label: "Amanda", shape: "box"},
         {id: 4, label: "Steffanie", shape: "circle"},
@@ -36,11 +36,19 @@ export const AppWrapper = ({children}) => {
         setNodes(arrayCopy);
     };
 
-    const addEdge = () => {
-        const newEdge = {from: 1, to: 10};
+    const addEdge = (sourceID, targetID) => {
+        const newEdge = {from: sourceID, to: targetID};
+        console.log(sourceID)
+        console.log(targetID)
+        console.log("edges before: ")
+        console.log(edges)
         const arrayCopy = [...edges];
         arrayCopy.push(newEdge);
+        console.log("copy of array after pushing")
+        console.log(arrayCopy)
         setEdges(arrayCopy);
+        console.log("edges after: ");
+        console.log(edges)
     }
 
     return (
