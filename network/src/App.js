@@ -3,6 +3,7 @@ import PrayerMap from './components/graph';
 import IndividualPrayerForm from './AddPersonForm.tsx';
 import OrgPrayerForm from './AddOrgForm.tsx';
 import { Header } from './Header';
+import AddLinkForm from './AddLinkForm.tsx';
 
 function App() {
   console.log("script started")
@@ -11,6 +12,7 @@ function App() {
       <Header />
       <IndividualPrayerForm />
       <OrgPrayerForm />
+      <AddLinkForm />
       <PrayerMap />
     </div>
   );
