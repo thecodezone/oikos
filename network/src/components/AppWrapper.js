@@ -5,7 +5,7 @@ export const AppData = () => useContext(AppContext)
 
 export const AppWrapper = ({children}) => {
     const [nodes, setNodes] = useState([
-        {id: 1, label: "Jayden", shape: "circle", name: "Jayden"},
+        {id: 1, label: "Jayden", shape: "circle"},
         {id: 2, label: "Ryan", shape: "box"},
         {id: 3, label: "Amanda", shape: "box"},
         {id: 4, label: "Steffanie", shape: "circle"},
@@ -17,15 +17,15 @@ export const AppWrapper = ({children}) => {
         {id: 10, label: "Joya", shape: "box"}
     ])
     const [edges, setEdges] = useState([
-        {from: 1, to: 2},
-        {from: 2, to: 3},
-        {from: 1, to: 4},
-        {from: 1, to: 5},
-        {from: 1, to: 6},
-        {from: 1, to: 7},
-        {from: 3, to: 8},
-        {from: 3, to: 9},
-        {from: 4, to: 10}
+        {from: 1, to: 2, label: "Uncle"},
+        {from: 2, to: 3, label: "Wife"},
+        {from: 1, to: 4, label: "Mother"},
+        {from: 1, to: 5, label: "Friend"},
+        {from: 1, to: 6, label: "Friend"},
+        {from: 1, to: 7, label: "Friend"},
+        {from: 3, to: 8, label: "Child"},
+        {from: 3, to: 9, label: "Child"},
+        {from: 4, to: 10, label: "Friend"}
     ])
 
     const addPerson = (name) => {
@@ -36,8 +36,8 @@ export const AppWrapper = ({children}) => {
         setNodes(arrayCopy);
     };
 
-    const addEdge = (sourceID, targetID) => {
-        const newEdge = {from: sourceID, to: targetID};
+    const addEdge = (sourceID, targetID, label) => {
+        const newEdge = {from: sourceID, to: targetID, label: label};
         console.log(sourceID)
         console.log(targetID)
         console.log("edges before: ")

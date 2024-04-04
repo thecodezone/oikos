@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, ButtonGroup, defaultTheme, Picker, Provider } from '@adobe/react-spectrum';
+import {Button, ButtonGroup, defaultTheme, Provider, TextField } from '@adobe/react-spectrum';
 import { Item, ComboBox } from '@adobe/react-spectrum';
 import { Form, ActionButton,  Content, Dialog, DialogTrigger } from '@adobe/react-spectrum';
 import { Heading } from '@adobe/react-spectrum';
@@ -14,6 +14,7 @@ export default function IndividualPrayerForm() {
   let [targetID, setTargetID] = React.useState();
   console.log(sourceOptions);
 
+  let [relation, setRelation] = React.useState('');
   let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default browser page refresh.
     e.preventDefault();
@@ -36,22 +37,24 @@ export default function IndividualPrayerForm() {
             <Content>
               <Form validationBehavior="native" onSubmit={onSubmit} id="link-form">
                 <p></p>
-                <ComboBox
+                <ComboBox isRequired
                     label="Source:"
                     items={sourceOptions}
                     onSelectionChange={setSourceID}>
                     {item => <Item>{item.label}</Item>}
                 </ComboBox>
                 <p></p>
-                <ComboBox
+                <ComboBox isRequired
                     label="Target:"
                     items={targetOptions}
                     onSelectionChange={setTargetID}>
                     {item => <Item>{item.label}</Item>}
                 </ComboBox>
                 <p></p>
+                <TextField name="relation" value={relation} onChange={setRelation} label="Relation" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+                <p></p>
                 <ButtonGroup>
-                <Button type="submit" variant="accent" onPress={() => {ToastQueue.positive('successfully added link', {timeout:1500}); addEdge(sourceID, targetID); close()}}>Add Link</Button>
+                <Button type="submit" variant="accent" onPress={() => {ToastQueue.positive('successfully added link', {timeout:1500}); addEdge(sourceID, targetID, relation); close()}}>Add Link</Button>
                 <Button type="reset" variant="primary" onPress={close}>Cancel</Button>
                 </ButtonGroup>
               </Form>

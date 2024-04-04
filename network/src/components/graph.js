@@ -4,7 +4,7 @@ import { options } from './options';
 import { AppData } from './AppWrapper';
 
 export default function GraphView() {
-    const { nodes, edges, addEdge } = AppData();
+    const { nodes, edges } = AppData();
     var data = {nodes: nodes, edges: edges}
     return (
         <>
