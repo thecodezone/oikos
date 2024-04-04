@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { Person } from '../personModel'
+import { Organization } from '../orgModel'
 
 const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
@@ -28,11 +30,21 @@ export const AppWrapper = ({children}) => {
         {from: 4, to: 10}
     ])
 
-    const addPerson = (name) => {
+    const addPerson = (name, phone, status, request, reminder) => {
         var id = nodes.length + 1
-        const newPerson = {id: id, label: name, shape: "box"};
+        const newPerson = new Person(name, phone, status, request, reminder)
+        const personEntry = {id: newPerson.getID(), label: name, shape: "box"};
         const arrayCopy = [...nodes]; //creating a copy
-        arrayCopy.push(newPerson);
+        arrayCopy.push(personEntry);
+        setNodes(arrayCopy);
+    };
+
+    const addOrganization = (name, description, website, request, reminder) => {
+        var id = nodes.length + 1
+        const newOrg = new Organization(name, description, website, request, reminder)
+        const orgEntry = {id: newOrg.getID(), label: name, shape: "box"};
+        const arrayCopy = [...nodes]; //creating a copy
+        arrayCopy.push(orgEntry);
         setNodes(arrayCopy);
     };
 
@@ -44,7 +56,7 @@ export const AppWrapper = ({children}) => {
     }
 
     return (
-        <AppContext.Provider value = {{nodes, edges, addPerson, addEdge}}>
+        <AppContext.Provider value = {{nodes, edges, addPerson, addOrganization, addEdge}}>
             {children}
         </AppContext.Provider>
     )

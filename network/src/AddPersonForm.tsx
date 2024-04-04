@@ -9,6 +9,10 @@ import { AppData } from './components/AppWrapper';
 
 export default function IndividualPrayerForm() {
   let [name, setName] = React.useState('');
+  let [phone, setPhone] = React.useState('');
+  let [status, setStatus] = React.useState('');
+  let [request, setRequest] = React.useState('');
+  let [reminder, setReminder] = React.useState(false);
   let [submitted, setSubmitted] = React.useState(null);
   const { addPerson } = AppData();
 
@@ -36,20 +40,20 @@ export default function IndividualPrayerForm() {
                 <p></p>
                 <TextField name="name" value={name} onChange={setName} label="Subject Name" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <TextField name="phone" label="Phone Number" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+                <TextField name="phone" value={phone} onChange={setPhone} label="Phone Number" type='tel' inputMode='tel' isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <RadioGroup name="status" label="Subject Status" isRequired necessityIndicator='icon'>
+                <RadioGroup name="status" value={status} onChange={setStatus} label="Subject Status" isRequired necessityIndicator='icon'>
                   <Radio value="believer">Believer</Radio>
                   <Radio value="seeker">Seeker</Radio>
                   <FieldError/>
                 </RadioGroup>
                 <p></p>
-                <TextArea name="request" label="Prayer Request"  width="size-3000" maxWidth="100%" necessityIndicator="label" placeholder="Enter request here..."/>
+                <TextArea name="request" value={request} onChange={setRequest} label="Prayer Request"  width="size-3000" maxWidth="100%" necessityIndicator="label" description="Enter request here..."/>
                 <p></p>
-                <Checkbox name="reminder">Add Prayer Reminder?</Checkbox>
+                <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>Add Prayer Reminder?</Checkbox>
                 <p></p>
                 <ButtonGroup>
-                <Button type="submit" variant="accent" onPress={() => {ToastQueue.positive(name + ' successfully added to map', {timeout:1500}); addPerson(name); close()}}>Add to map</Button>
+                <Button type="submit" variant="accent" onPress={() => {ToastQueue.positive(name + ' successfully added to map', {timeout:1500}); addPerson(name, phone, status, request, reminder); close()}}>Add to map</Button>
                 <Button type="reset" variant="primary" onPress={close}>Cancel</Button>
                   <DialogTrigger isDismissable type="popover">
                     <Button variant="secondary">ⓘ</Button>
