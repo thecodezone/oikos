@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { Person } from '../personModel'
+import { Organization } from '../orgModel'
 import {ToastQueue} from '@react-spectrum/toast'
 
 const AppContext = createContext()
@@ -28,6 +30,23 @@ export const AppWrapper = ({children}) => {
         {from: 3, to: 9, label: "Child"},
         {from: 4, to: 10, label: "Friend"}
     ])
+
+    const addPerson = (name, phone, status, request, reminder) => {
+        var id = nodes.length + 1
+        const newPerson = new Person(name, phone, status, request, reminder)
+        const personEntry = {id: newPerson.getID(), label: name, shape: "box"};
+        const arrayCopy = [...nodes]; //creating a copy
+        arrayCopy.push(personEntry);
+        setNodes(arrayCopy);
+    };
+
+    const addOrganization = (name, description, website, request, reminder) => {
+        var id = nodes.length + 1
+        const newOrg = new Organization(name, description, website, request, reminder)
+        const orgEntry = {id: newOrg.getID(), label: name, shape: "box"};
+        const arrayCopy = [...nodes]; //creating a copy
+        arrayCopy.push(orgEntry);
+        setNodes(arrayCopy);
 
     let [state, setState] = useState({
         graph: {nodes: nodes, edges: edges},
@@ -123,7 +142,7 @@ export const AppWrapper = ({children}) => {
     }
 
     return (
-        <AppContext.Provider value = {{state, nodes, edges, addPerson, addEdge}}>
+        <AppContext.Provider value = {{state, nodes, edges, addPerson, addOrganization, addEdge}}>
             {children}
         </AppContext.Provider>
     )
