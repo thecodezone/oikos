@@ -1,10 +1,8 @@
-import React, {useRef, useCallback, useState} from 'react';
+import React from 'react';
 import {Button, ButtonGroup, defaultTheme, TextField, Provider, Checkbox, TextArea} from '@adobe/react-spectrum';
-import {ListBox, Item, ComboBox, Picker, Radio, RadioGroup, ProgressCircle} from '@adobe/react-spectrum';
-import {Link, Form, ToggleButton, ActionButton,  Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
+import {Link, Form, ActionButton,  Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
-import {ToastContainer, ToastQueue} from '@react-spectrum/toast'
-import {Input, Label, Modal, FieldError, OverlayArrow, Popover} from 'react-aria-components';
+import {ToastContainer} from '@react-spectrum/toast'
 import { AppData } from './components/AppWrapper';
 
 export default function OrgPrayerForm() {
@@ -15,6 +13,22 @@ export default function OrgPrayerForm() {
   let [reminder, setReminder] = React.useState(false);
   let [submitted, setSubmitted] = React.useState(null);
   const { addOrganization } = AppData();
+
+  function isDisabled() 
+  {
+    if (name === ''){
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  function handleClose()
+  {
+    setName('');
+  }
 
   let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default browser page refresh.
@@ -36,7 +50,7 @@ export default function OrgPrayerForm() {
           <Dialog size="S">
           <Heading>Pray for an Organization</Heading>
             <Content>
-              <Form validationBehavior='aria' onSubmit={onSubmit} id="prayer-form">
+              <Form validationBehavior="native" onSubmit={onSubmit} id="org-form">
                 <p></p>
                 <TextField name="name" value={name} onChange={setName} label="Organization Name" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
@@ -49,9 +63,9 @@ export default function OrgPrayerForm() {
                 <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>Add Prayer Reminder?</Checkbox>
                 <p></p>
                 <ButtonGroup>
-                <Button type="submit" variant="accent" onPress={
-                  () => {ToastQueue.positive(name + ' successfully added to map', {timeout:1500}); 
-                  addOrganization(name, description, website, request, reminder); 
+                <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={
+                  () => { 
+                  addOrganization(name, description, website, request, reminder); handleClose();
                   close()}
                 }>Add to map</Button>
                 <Button type="reset" variant="primary" onPress={close}>Cancel</Button>

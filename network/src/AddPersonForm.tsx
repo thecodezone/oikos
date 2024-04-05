@@ -1,10 +1,10 @@
-import React, {useRef, useCallback, useState} from 'react';
+import React from 'react';
 import {Button, ButtonGroup, defaultTheme, TextField, Provider, Checkbox, TextArea} from '@adobe/react-spectrum';
-import {ListBox, Item, ComboBox, Picker, Radio, RadioGroup, ProgressCircle} from '@adobe/react-spectrum';
-import {Link, Form, ToggleButton, ActionButton,  Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
+import {Radio, RadioGroup} from '@adobe/react-spectrum';
+import {Link, Form, ActionButton,  Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
-import {ToastContainer, ToastQueue} from '@react-spectrum/toast'
-import {Input, Label, Modal, FieldError, OverlayArrow, Popover} from 'react-aria-components';
+import {ToastContainer} from '@react-spectrum/toast'
+import {FieldError} from 'react-aria-components';
 import { AppData } from './components/AppWrapper';
 
 export default function IndividualPrayerForm() {
@@ -14,7 +14,24 @@ export default function IndividualPrayerForm() {
   let [request, setRequest] = React.useState('');
   let [reminder, setReminder] = React.useState(false);
   let [submitted, setSubmitted] = React.useState(null);
+
   const { addPerson } = AppData();
+
+  function isDisabled() {
+    if (name === '' || status === ''){
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  function handleClose()
+  {
+    setName('');
+    setStatus('');
+  }
 
   let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default browser page refresh.
@@ -36,13 +53,17 @@ export default function IndividualPrayerForm() {
           <Dialog size="S">
           <Heading>Pray for Someone</Heading>
             <Content>
-              <Form validationBehavior="native" onSubmit={onSubmit} id="prayer-form">
+              <Form validationBehavior="native" onSubmit={onSubmit} id="person-form">
+                <p>(* is required)</p>
                 <p></p>
                 <TextField name="name" value={name} onChange={setName} label="Subject Name" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <TextField name="phone" value={phone} onChange={setPhone} label="Phone Number" type='tel' inputMode='tel' isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+                <TextField name="phone" value={phone} onChange={setPhone} label="Phone Number" 
+                  type='tel' inputMode='tel' isQuiet isRequired necessityIndicator="icon" 
+                  labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <RadioGroup name="status" value={status} onChange={setStatus} label="Subject Status" isRequired necessityIndicator='icon'>
+                <RadioGroup name="status" value={status} onChange={setStatus} 
+                  label="Subject Status" isRequired necessityIndicator='icon'>
                   <Radio value="believer">Believer</Radio>
                   <Radio value="seeker">Seeker</Radio>
                   <FieldError/>
@@ -53,7 +74,10 @@ export default function IndividualPrayerForm() {
                 <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>Add Prayer Reminder?</Checkbox>
                 <p></p>
                 <ButtonGroup>
-                <Button type="submit" variant="accent" onPress={() => {ToastQueue.positive(name + ' successfully added to map', {timeout:1500}); addPerson(name, phone, status, request, reminder); close()}}>Add to map</Button>
+                <Button type="submit" variant="accent" isDisabled={isDisabled()}
+                  onPress={() => {addPerson(name, phone, status, request, reminder); 
+                                  handleClose(); 
+                                  close()}}>Add to map</Button>
                 <Button type="reset" variant="primary" onPress={close}>Cancel</Button>
                   <DialogTrigger isDismissable type="popover">
                     <Button variant="secondary">ⓘ</Button>
