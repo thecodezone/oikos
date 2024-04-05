@@ -32,73 +32,105 @@ export const AppWrapper = ({children}) => {
     ])
 
     const addPerson = (name, phone, status, request, reminder) => {
-        var id = nodes.length + 1
+      if (name !== '' && status !== '')
+      {
+        name = adjustDuplicateName(name);
+        let nodeShape = "box"
+        if (status === 'believer')
+        {
+            nodeShape = "circle"
+        }
         const newPerson = new Person(name, phone, status, request, reminder)
-        const personEntry = {id: newPerson.getID(), label: name, shape: "box"};
+        const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
         setNodes(arrayCopy);
+        updateNodeState(personEntry)
+      }
+      else
+      {
+        ToastQueue.negative('Missing required fields.', {timeout:1500});
+      }
     };
 
     const addOrganization = (name, description, website, request, reminder) => {
-        var id = nodes.length + 1
+      if (name !== '')
+      {
+        name = adjustDuplicateName(name);
         const newOrg = new Organization(name, description, website, request, reminder)
         const orgEntry = {id: newOrg.getID(), label: name, shape: "box"};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(orgEntry);
         setNodes(arrayCopy);
+        updateNodeState(orgEntry);
+      }
+      else
+      {
+        ToastQueue.negative('Missing required fields.', {timeout:1500});
+      }
+    }
+
+    const adjustDuplicateName = (name) => {
+      let duplicateExists = false;
+      let duplicateCount = 0;
+      for (let i = 0; i<nodes.length; i++)
+      {
+        let tempName = nodes[i].label;
+        if (tempName.includes(' ('))
+        {
+          tempName = nodes[i].label.substring(0, nodes[i].label.lastIndexOf(' '))
+        }
+        if (tempName === name)
+        {
+            duplicateExists = true;
+            duplicateCount++;
+        }
+      }
+      if (duplicateExists)
+      {
+        ToastQueue.info(' Duplicate name detected: ' + name + ' renamed to ' + name + ' (' + duplicateCount + ')', {timeout:1500});
+        return name + ' (' + duplicateCount + ')';
+      }
+      else
+      {
+        return name;
+      }
+    }
+
 
     let [state, setState] = useState({
-        graph: {nodes: nodes, edges: edges},
-        events: {
-            select: ({ nodes, edges }) => {
-              //console.log("Selected nodes:");
-              //console.log(nodes);
-              //console.log("Selected edges:");
-              //console.log(edges);
-              //alert("Selected node: " + nodes);
-            },
-            doubleClick: ({ pointer: { canvas } }) => {
-              //AlertDialog();
-            }
+      graph: {nodes: nodes, edges: edges},
+      events: {
+          select: ({ nodes, edges }) => {
+            //console.log("Selected nodes:");
+            //console.log(nodes);
+            //console.log("Selected edges:");
+            //console.log(edges);
+            //alert("Selected node: " + nodes);
+          },
+          doubleClick: ({ pointer: { canvas } }) => {
+            //AlertDialog();
           }
+        }
     })
 
-    const addPerson = (name, followerStatus) => {
-        if (name !== '' && followerStatus !== '')
-        {
-            // updates the nodes in the array
-            let id = nodes.length + 1;
-            let status = "box"
-            if (followerStatus === 'believer')
-            {
-                status = "circle"
-            }
-            const newPerson = {id: id, label: name, shape: status};
-            const arrayCopy = [...nodes];
-            arrayCopy.push(newPerson);
-            setNodes(arrayCopy);
-            // updates the nodes in the state with the new node
-            setState(({ graph: { nodes, edges }, ...rest }) => {
-                return {
-                  graph: {
-                    nodes: [
-                      ...nodes,
-                      newPerson
-                    ],
-                    edges: [
-                      ...edges
-                    ]
-                  },
-                  ...rest
-                }
-            });
-            ToastQueue.positive(name + ' successfully added to map', {timeout:1500});
-        }
-        else
-        {
-            ToastQueue.negative('Missing required fields.', {timeout:1500});
-        }
+    const updateNodeState = (node) => {
+      // updates the nodes in the state with the new node
+      setState(({ graph: { nodes, edges }, ...rest }) => {
+          return {
+            graph: {
+              nodes: [
+                ...nodes,
+                node
+              ],
+              edges: [
+                ...edges
+              ]
+            },
+            ...rest
+          }
+      });
+      ToastQueue.positive(node.label + ' successfully added to map', {timeout:1500});
     };
 
     const addEdge = (sourceID, targetID, label) => {

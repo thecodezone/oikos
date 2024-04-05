@@ -30,7 +30,10 @@ export default function IndividualPrayerForm() {
   function handleClose()
   {
     setName('');
+    setPhone('');
     setStatus('');
+    setRequest('');
+    setReminder(false);
   }
 
   let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -59,7 +62,7 @@ export default function IndividualPrayerForm() {
                 <TextField name="name" value={name} onChange={setName} label="Subject Name" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
                 <TextField name="phone" value={phone} onChange={setPhone} label="Phone Number" 
-                  type='tel' inputMode='tel' isQuiet isRequired necessityIndicator="icon" 
+                  type='tel' inputMode='tel' isQuiet necessityIndicator="icon" 
                   labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
                 <RadioGroup name="status" value={status} onChange={setStatus} 
