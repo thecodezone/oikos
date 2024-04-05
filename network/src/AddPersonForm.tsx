@@ -1,16 +1,32 @@
-import React, {useRef, useCallback, useState} from 'react';
+import React from 'react';
 import {Button, ButtonGroup, defaultTheme, TextField, Provider, Checkbox, TextArea} from '@adobe/react-spectrum';
-import {ListBox, Item, ComboBox, Picker, Radio, RadioGroup, ProgressCircle} from '@adobe/react-spectrum';
-import {Link, Form, ToggleButton, ActionButton,  Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
+import {Radio, RadioGroup} from '@adobe/react-spectrum';
+import {Link, Form, ActionButton,  Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
-import {ToastContainer, ToastQueue} from '@react-spectrum/toast'
-import {Input, Label, Modal, FieldError, OverlayArrow, Popover} from 'react-aria-components';
+import {ToastContainer} from '@react-spectrum/toast'
+import {FieldError} from 'react-aria-components';
 import { AppData } from './components/AppWrapper';
 
 export default function IndividualPrayerForm() {
   let [name, setName] = React.useState('');
-  let [submitted, setSubmitted] = React.useState(null);
+  let [followerStatus, setFollowerStatus] = React.useState('');
   const { addPerson } = AppData();
+
+  function isDisabled() {
+    if (name === '' || followerStatus === ''){
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  function handleClose()
+  {
+    setName('');
+    setFollowerStatus('');
+  }
 
   let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default browser page refresh.
@@ -32,13 +48,19 @@ export default function IndividualPrayerForm() {
           <Dialog size="S">
           <Heading>Pray for Someone</Heading>
             <Content>
-              <Form validationBehavior="native" onSubmit={onSubmit} id="prayer-form">
+              <Form validationBehavior="native" onSubmit={onSubmit} id="person-form">
+                <p>(* is required)</p>
                 <p></p>
                 <TextField name="name" value={name} onChange={setName} label="Subject Name" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <TextField name="phone" label="Phone Number" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+                <TextField name="phone" label="Phone Number" isQuiet necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <RadioGroup name="status" label="Subject Status" isRequired necessityIndicator='icon'>
+                <RadioGroup name="status" 
+                label="Subject Status" 
+                isRequired 
+                necessityIndicator='icon'
+                value={followerStatus}
+                onChange={setFollowerStatus}>
                   <Radio value="believer">Believer</Radio>
                   <Radio value="seeker">Seeker</Radio>
                   <FieldError/>
@@ -49,7 +71,7 @@ export default function IndividualPrayerForm() {
                 <Checkbox name="reminder">Add Prayer Reminder?</Checkbox>
                 <p></p>
                 <ButtonGroup>
-                <Button type="submit" variant="accent" onPress={() => {ToastQueue.positive(name + ' successfully added to map', {timeout:1500}); addPerson(name); close()}}>Add to map</Button>
+                <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={() => {addPerson(name, followerStatus); handleClose(); close();}}>Add to map</Button>
                 <Button type="reset" variant="primary" onPress={close}>Cancel</Button>
                   <DialogTrigger isDismissable type="popover">
                     <Button variant="secondary">ⓘ</Button>

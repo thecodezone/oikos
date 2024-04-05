@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import {ToastQueue} from '@react-spectrum/toast'
 
 const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
@@ -28,31 +29,101 @@ export const AppWrapper = ({children}) => {
         {from: 4, to: 10, label: "Friend"}
     ])
 
-    const addPerson = (name) => {
-        var id = nodes.length + 1
-        const newPerson = {id: id, label: name, shape: "box"};
-        const arrayCopy = [...nodes]; //creating a copy
-        arrayCopy.push(newPerson);
-        setNodes(arrayCopy);
+    let [state, setState] = useState({
+        graph: {nodes: nodes, edges: edges},
+        events: {
+            select: ({ nodes, edges }) => {
+              //console.log("Selected nodes:");
+              //console.log(nodes);
+              //console.log("Selected edges:");
+              //console.log(edges);
+              //alert("Selected node: " + nodes);
+            },
+            doubleClick: ({ pointer: { canvas } }) => {
+              //AlertDialog();
+            }
+          }
+    })
+
+    const addPerson = (name, followerStatus) => {
+        if (name !== '' && followerStatus !== '')
+        {
+            // updates the nodes in the array
+            let id = nodes.length + 1;
+            let status = "box"
+            if (followerStatus === 'believer')
+            {
+                status = "circle"
+            }
+            const newPerson = {id: id, label: name, shape: status};
+            const arrayCopy = [...nodes];
+            arrayCopy.push(newPerson);
+            setNodes(arrayCopy);
+            // updates the nodes in the state with the new node
+            setState(({ graph: { nodes, edges }, ...rest }) => {
+                return {
+                  graph: {
+                    nodes: [
+                      ...nodes,
+                      newPerson
+                    ],
+                    edges: [
+                      ...edges
+                    ]
+                  },
+                  ...rest
+                }
+            });
+            ToastQueue.positive(name + ' successfully added to map', {timeout:1500});
+        }
+        else
+        {
+            ToastQueue.negative('Missing required fields.', {timeout:1500});
+        }
     };
 
     const addEdge = (sourceID, targetID, label) => {
-        const newEdge = {from: sourceID, to: targetID, label: label};
-        console.log(sourceID)
-        console.log(targetID)
-        console.log("edges before: ")
-        console.log(edges)
-        const arrayCopy = [...edges];
-        arrayCopy.push(newEdge);
-        console.log("copy of array after pushing")
-        console.log(arrayCopy)
-        setEdges(arrayCopy);
-        console.log("edges after: ");
-        console.log(edges)
+        if (sourceID !== null && targetID !== null && label !== '')
+        {
+            for (let i = 0; i<edges.length; i++)
+            {
+                if (edges[i].from === sourceID && edges[i].to === targetID)
+                {
+                    ToastQueue.info('Edge from ' + nodes.find(x => x.id === sourceID).label + 
+                    ' to ' + nodes.find(x => x.id === targetID).label + ' already exists.', {timeout:1500})
+                    return;
+                }
+            }
+            // updates the edges array
+            const newEdge = {from: sourceID, to: targetID, label: label};
+            const arrayCopy = [...edges];
+            arrayCopy.push(newEdge);
+            setEdges(arrayCopy);
+            // updates the edges in the state with the new edge
+            setState(({ graph: { nodes, edges }, ...rest }) => {
+                return {
+                  graph: {
+                    nodes: [
+                      ...nodes
+                    ],
+                    edges: [
+                      ...edges,
+                      newEdge
+                    ]
+                  },
+                  ...rest
+                }
+            });
+            ToastQueue.positive('Successfully added link.', {timeout:1500});
+        }
+        else
+        {
+            ToastQueue.negative('Missing required fields.', {timeout:1500});
+        }
     }
 
     return (
-        <AppContext.Provider value = {{nodes, edges, addPerson, addEdge}}>
+        <AppContext.Provider value = {{state, nodes, edges, addPerson, addEdge}}>
             {children}
         </AppContext.Provider>
     )

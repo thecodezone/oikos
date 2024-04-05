@@ -1,16 +1,29 @@
-import React, {useRef, useCallback, useState} from 'react';
+import React from 'react';
 import {Button, ButtonGroup, defaultTheme, TextField, Provider, Checkbox, TextArea} from '@adobe/react-spectrum';
-import {ListBox, Item, ComboBox, Picker, Radio, RadioGroup, ProgressCircle} from '@adobe/react-spectrum';
-import {Link, Form, ToggleButton, ActionButton,  Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
+import {Link, Form, ActionButton,  Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
-import {ToastContainer, ToastQueue} from '@react-spectrum/toast'
-import {Input, Label, Modal, FieldError, OverlayArrow, Popover} from 'react-aria-components';
+import {ToastContainer} from '@react-spectrum/toast'
 import { AppData } from './components/AppWrapper';
 
 export default function OrgPrayerForm() {
   let [name, setName] = React.useState('');
-  let [submitted, setSubmitted] = React.useState(null);
   const { addPerson } = AppData();
+
+  function isDisabled() 
+  {
+    if (name === ''){
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  function handleClose()
+  {
+    setName('');
+  }
 
   let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default browser page refresh.
@@ -32,20 +45,21 @@ export default function OrgPrayerForm() {
           <Dialog size="S">
           <Heading>Pray for an Organization</Heading>
             <Content>
-              <Form validationBehavior="native" onSubmit={onSubmit} id="prayer-form">
+              <Form validationBehavior="native" onSubmit={onSubmit} id="org-form">
+                <p>(* is required)</p>
                 <p></p>
                 <TextField name="name" value={name} onChange={setName} label="Organization Name" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <TextField name="description" label="Description of Organization" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+                <TextField name="description" label="Description of Organization" isQuiet necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
-                <TextField name="website" label="Website Link/Contact Information" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+                <TextField name="website" label="Website Link/Contact Information" isQuiet necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
                 <p></p>
                 <TextArea name="request" label="Prayer Request"  width="size-3000" maxWidth="100%" necessityIndicator="label" placeholder="Enter request here..."/>
                 <p></p>
                 <Checkbox name="reminder">Add Prayer Reminder?</Checkbox>
                 <p></p>
                 <ButtonGroup>
-                <Button type="submit" variant="accent" onPress={() => {ToastQueue.positive(name + ' successfully added to map', {timeout:1500}); addPerson(name); close()}}>Add to map</Button>
+                <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={() => {addPerson(name, 'seeker'); handleClose(); close();}}>Add</Button>
                 <Button type="reset" variant="primary" onPress={close}>Cancel</Button>
                   <DialogTrigger isDismissable type="popover">
                     <Button variant="secondary">ⓘ</Button>

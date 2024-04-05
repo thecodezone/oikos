@@ -4,14 +4,15 @@ import { options } from './options';
 import { AppData } from './AppWrapper';
 
 export default function GraphView() {
-    const { nodes, edges } = AppData();
-    var data = {nodes: nodes, edges: edges}
+    const { state } = AppData();
+    const { graph, events } = state; 
     return (
         <>
         <div className='container'>
             <Graph
-                graph = {data}
+                graph = {graph}
                 options = {options}
+                events = {events}
             />
         </div>
         </>
