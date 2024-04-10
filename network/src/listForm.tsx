@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, ButtonGroup, defaultTheme, ListView, Provider, TextField } from '@adobe/react-spectrum';
+import {Button, ButtonGroup, defaultTheme, ListView, Provider, TextField, TableView, TableHeader, Row, Column, TableBody, Cell } from '@adobe/react-spectrum';
 import { Item, ComboBox } from '@adobe/react-spectrum';
 import { Form, ActionButton,  Content, Dialog, DialogTrigger } from '@adobe/react-spectrum';
 import { Heading } from '@adobe/react-spectrum';
@@ -7,8 +7,29 @@ import {ToastContainer} from '@react-spectrum/toast'
 import { AppData } from './components/AppWrapper';
 
 export default function ViewListForm() {
-  const { nodes } = AppData();
-  let rows = nodes;
+  const { edges, nodes } = AppData();
+  let columns = [
+    { name: 'Name', uid: 'from' },
+    { name: 'Connections', uid: 'to'},
+  ];
+  
+  let nodeConnectionItems:{
+    from: string;
+    to: string;
+  }[] = [];
+
+  for(let i = 0; i < edges.length; i++){
+    let fromID = edges[i].from;
+    let fromNodeName = nodes.find(x => x.id === fromID).label;
+
+    let toID = edges[i].to;
+    let toNodeName = nodes.find(x => x.id === toID).label;
+    let nodeConnectionItem = {id: i+1, from: fromNodeName, to: toNodeName};
+    
+    nodeConnectionItems.push(nodeConnectionItem);
+  };
+
+  let rows = nodeConnectionItems;
 
   let [selectedKeys, setSelectedKeys] = React.useState();
 
@@ -34,19 +55,27 @@ export default function ViewListForm() {
           <Heading>Graph as List</Heading>
             <Content>
               <Form validationBehavior="native" onSubmit={onSubmit} id="link-form">
-               <ListView maxWidth="size-6000" 
-               aria-label="ListView with controlled selection" 
-               selectionStyle="highlight"
-               selectionMode="single"
-               items={rows}
-               selectedKeys={selectedKeys}
-               onSelectionChange={setSelectedKeys}>
-               {(item) => (
-                    <Item>
-                    {item.label}
-                    </Item>
-                )}
-                </ListView>
+              <TableView
+                aria-label="Example table with dynamic content"
+                maxWidth="size-6000"
+              >
+                <TableHeader columns={columns}>
+                  {(column) => (
+                    <Column
+                      key={column.uid}
+                    >
+                      {column.name}
+                    </Column>
+                  )}
+                </TableHeader>
+                <TableBody items={rows}>
+                  {(item) => (
+                    <Row>
+                      {(columnKey) => <Cell>{item[columnKey]}</Cell>}
+                    </Row>
+                  )}
+                </TableBody>
+              </TableView>
                 <p></p>
                 <ButtonGroup>
                 <Button type="reset" variant="primary" onPress={close}>Close</Button>
