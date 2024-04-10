@@ -18,16 +18,25 @@ export default function ViewListForm() {
     to: string;
   }[] = [];
 
-  for(let i = 0; i < edges.length; i++){
-    let fromID = edges[i].from;
-    let fromNodeName = nodes.find(x => x.id === fromID).label;
-
-    let toID = edges[i].to;
-    let toNodeName = nodes.find(x => x.id === toID).label;
-    let nodeConnectionItem = {id: i+1, from: fromNodeName, to: toNodeName};
-    
+  for(let i = 0; i < nodes.length;i++){
+    let fromString = nodes[i].label
+    let connection = ""
+    for(let j = 0; j < edges.length; j++){
+      if(edges[j].from === nodes[i].id){
+        let toNodeName = nodes.find(x => x.id === edges[j].to).label;
+        if(connection === ""){
+          connection = toNodeName
+        }
+        else{
+          connection = connection + ", " + toNodeName
+        }
+      }
+    }
+    let nodeConnectionItem = {id: i+1, from: fromString, to: connection};
+      
     nodeConnectionItems.push(nodeConnectionItem);
-  };
+    }
+  
 
   let rows = nodeConnectionItems;
 
@@ -51,13 +60,17 @@ export default function ViewListForm() {
       <DialogTrigger isDismissable mobileType='tray'>
         <ActionButton>View List</ActionButton>
         {( close ) => (
-          <Dialog size="S">
+          <Dialog size="L">
           <Heading>Graph as List</Heading>
             <Content>
               <Form validationBehavior="native" onSubmit={onSubmit} id="link-form">
               <TableView
+                flex
                 aria-label="Example table with dynamic content"
-                maxWidth="size-6000"
+                selectionMode='single'
+                selectionStyle='highlight'
+                selectedKeys={selectedKeys}
+                onSelectionChange={setSelectedKeys}
               >
                 <TableHeader columns={columns}>
                   {(column) => (
