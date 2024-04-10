@@ -6,7 +6,7 @@ import { Heading } from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
 import { AppData } from './components/AppWrapper';
 
-export default function IndividualPrayerForm() {
+export default function AddLinkForm() {
   const { addEdge, nodes } = AppData();
   let sourceOptions = nodes
   let targetOptions = nodes
