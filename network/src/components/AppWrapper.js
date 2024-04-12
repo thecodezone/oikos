@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { Person } from '../personModel'
 import { Organization } from '../orgModel'
 import {ToastQueue} from '@react-spectrum/toast'
+import Graph from 'react-vis-network-graph';
+import { options } from './options';
 
 const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
@@ -97,7 +99,6 @@ export const AppWrapper = ({children}) => {
       }
     }
 
-
     let [state, setState] = useState({
       graph: {nodes: nodes, edges: edges},
       events: {
@@ -110,8 +111,26 @@ export const AppWrapper = ({children}) => {
           },
           doubleClick: ({ pointer: { canvas } }) => {
             //AlertDialog();
+          },
+          oncontext: (event) => {
+            // redraw needed for event pointer to work (unexplained as to why)
+            state.network.redraw();
+            let nodeID = state.network.getNodeAt(event.pointer.DOM);
+            let edgeID = state.network.getEdgeAt( event.pointer.DOM );
+            if (nodeID !== undefined) {
+              console.log(`node selected: ${nodeID}`);
+            }
+            else if (edgeID !== undefined)
+            {
+              console.log(`edge selected: ${edgeID}`);
+            }
+            else
+            {
+              console.log(`canvas background selected`)
+            }
           }
-        }
+        },
+        network: null
     })
 
     const updateNodeState = (node) => {
@@ -173,9 +192,24 @@ export const AppWrapper = ({children}) => {
         }
     }
 
+    const setNetworkInstance = nw => {
+      state.network = nw;
+    };
+
     return (
         <AppContext.Provider value = {{state, nodes, edges, addPerson, addOrganization, addEdge}}>
             {children}
+            <div className='container'
+            onContextMenu={(e) => {
+              e.preventDefault(); // prevent the default behaviour when right clicked
+            }}>
+              <Graph
+                  graph = {state.graph}
+                  options = {options}
+                  events = {state.events}
+                  getNetwork={setNetworkInstance}
+              />
+            </div>
         </AppContext.Provider>
     )
 }

@@ -1,5 +1,4 @@
 import './App.css';
-import PrayerMap from './components/graph';
 import IndividualPrayerForm from './AddPersonForm.tsx';
 import OrgPrayerForm from './AddOrgForm.tsx';
 import { Header } from './Header';
@@ -11,13 +10,11 @@ function App() {
     <div className="App"
     onContextMenu={(e) => {
       e.preventDefault(); // prevent the default behaviour when right clicked
-      console.log("Right Click");
     }}>
       <Header />
       <IndividualPrayerForm />
       <OrgPrayerForm />
       <AddLinkForm />
-      <PrayerMap />
     </div>
   );
 }
