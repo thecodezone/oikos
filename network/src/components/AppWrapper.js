@@ -1,14 +1,18 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { Person } from '../personModel'
 import { Organization } from '../orgModel'
 import {ToastQueue} from '@react-spectrum/toast'
 import Graph from 'react-vis-network-graph';
 import { options } from './options';
+import NodeContextMenu from "./contextMenus/NodeContextMenu";
+import EdgeContextMenu from "./contextMenus/EdgeContextMenu";
+import CanvasContextMenu from "./contextMenus/CanvasContextMenu";
 
 const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
 
 export const AppWrapper = ({children}) => {
+  // nodes, edges, and state
     const [nodes, setNodes] = useState([
         {id: 1, label: "Jayden", shape: "circle"},
         {id: 2, label: "Ryan", shape: "box"},
@@ -33,6 +37,63 @@ export const AppWrapper = ({children}) => {
         {from: 4, to: 10, label: "Friend"}
     ])
 
+    let [state, setState] = useState({
+      graph: {nodes: nodes, edges: edges},
+      events: {
+          select: ({ nodes, edges }) => {
+            //console.log("Selected nodes:");
+            //console.log(nodes);
+            //console.log("Selected edges:");
+            //console.log(edges);
+            //alert("Selected node: " + nodes);
+          },
+          doubleClick: ({ pointer: { canvas } }) => {
+            //AlertDialog();
+          },
+          oncontext: (event) => {
+            // redraw needed for event pointer to work (unexplained as to why)
+            state.network.redraw();
+            let nodeID = state.network.getNodeAt(event.pointer.DOM);
+            let edgeID = state.network.getEdgeAt( event.pointer.DOM );
+            const contextMenuAttr = contextMenuRef.current.getBoundingClientRect()
+            const isLeft = event.pointer.DOM.x < window?.innerWidth / 2
+            let xPos = event.pointer.DOM.x
+            let yPos = event.pointer.DOM.y
+
+            if (!isLeft) {
+              xPos = xPos - contextMenuAttr.width
+            }
+
+            setPoints({
+              x: xPos,
+              y: yPos,
+            })
+            if (nodeID !== undefined) {
+              console.log(`node selected: ${nodeID}`);
+              resetEdgeContextMenu()
+              resetCanvasContextMenu()
+              handleNodeOnContextMenu(event)
+            }
+            else if (edgeID !== undefined)
+            {
+              console.log(`edge selected: ${edgeID}`);
+              resetNodeContextMenu()
+              resetCanvasContextMenu()
+              handleEdgeOnContextMenu(event)
+            }
+            else
+            {
+              console.log(`canvas background selected`)
+              resetNodeContextMenu()
+              resetEdgeContextMenu()
+              handleCanvasOnContextMenu(event)
+            }
+          }
+        },
+        network: null
+    })
+
+    // methods
     const addPerson = (name, phone, status, request, reminder) => {
       if (name !== '' && status !== '')
       {
@@ -99,40 +160,6 @@ export const AppWrapper = ({children}) => {
       }
     }
 
-    let [state, setState] = useState({
-      graph: {nodes: nodes, edges: edges},
-      events: {
-          select: ({ nodes, edges }) => {
-            //console.log("Selected nodes:");
-            //console.log(nodes);
-            //console.log("Selected edges:");
-            //console.log(edges);
-            //alert("Selected node: " + nodes);
-          },
-          doubleClick: ({ pointer: { canvas } }) => {
-            //AlertDialog();
-          },
-          oncontext: (event) => {
-            // redraw needed for event pointer to work (unexplained as to why)
-            state.network.redraw();
-            let nodeID = state.network.getNodeAt(event.pointer.DOM);
-            let edgeID = state.network.getEdgeAt( event.pointer.DOM );
-            if (nodeID !== undefined) {
-              console.log(`node selected: ${nodeID}`);
-            }
-            else if (edgeID !== undefined)
-            {
-              console.log(`edge selected: ${edgeID}`);
-            }
-            else
-            {
-              console.log(`canvas background selected`)
-            }
-          }
-        },
-        network: null
-    })
-
     const updateNodeState = (node) => {
       // updates the nodes in the state with the new node
       setState(({ graph: { nodes, edges }, ...rest }) => {
@@ -196,6 +223,91 @@ export const AppWrapper = ({children}) => {
       state.network = nw;
     };
 
+    // context menus
+    const contextMenuRef = useRef(null)
+    const [points, setPoints] = useState({
+        x: 0,
+        y: 0,
+    })
+    const [nodeContextMenu, setNodeContextMenu] = useState({
+      toggled: false
+    })
+    const [edgeContextMenu, setEdgeContextMenu] = useState({
+      toggled: false
+    })
+    const [canvasContextMenu, setCanvasContextMenu] = useState({
+      toggled: false
+    })
+
+    function handleNodeOnContextMenu(e) {
+      setNodeContextMenu({
+        toggled: true
+      })
+    }
+
+    function handleEdgeOnContextMenu(e) {
+      setEdgeContextMenu({
+        toggled: true
+      })
+    }
+
+    function handleCanvasOnContextMenu(e) {
+      setCanvasContextMenu({
+        toggled: true
+      })
+    }
+
+    function resetPoints() {
+      setPoints({
+        x: 0,
+        y: 0,
+      })
+    }
+
+    function resetNodeContextMenu() {
+      setNodeContextMenu({
+        toggled: false
+      })
+    }
+
+    function resetEdgeContextMenu() {
+      setEdgeContextMenu({
+        toggled: false
+      })
+    }
+
+    function resetCanvasContextMenu() {
+      setCanvasContextMenu({
+        toggled: false
+      })
+    }
+
+    useEffect(() => {
+      function handler(e) {
+        resetPoints()
+        if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
+          if (nodeContextMenu.toggled) {
+              console.log('resetting node context menu')
+              resetNodeContextMenu()
+          } 
+          else if (edgeContextMenu.toggled) {
+              console.log('resetting edge context menu')
+              resetEdgeContextMenu()
+          } 
+          else if (canvasContextMenu.toggled) {
+              console.log('resetting canvas context menu')
+              resetCanvasContextMenu()
+          }
+        }
+      }
+
+      document.addEventListener('click', handler)
+
+      return () => {
+        document.removeEventListener('click', handler)
+      }
+    })
+
     return (
         <AppContext.Provider value = {{state, nodes, edges, addPerson, addOrganization, addEdge}}>
             {children}
@@ -208,6 +320,75 @@ export const AppWrapper = ({children}) => {
                   options = {options}
                   events = {state.events}
                   getNetwork={setNetworkInstance}
+              />
+              <NodeContextMenu 
+                contextMenuRef={contextMenuRef}
+                isToggled={nodeContextMenu.toggled}
+                positionX={points.x}
+                positionY={points.y}
+                buttons={[
+                  {
+                    text: "node button 1",
+                    icon: "",
+                    onClick: () => alert("hello"),
+                  },
+                  {
+                    text: "node button 2",
+                    icon: "",
+                    onClick: () => alert("wow"),
+                  },
+                  {
+                    text: "node button 3",
+                    icon: "",
+                    onClick: () => alert("goodbye"),
+                  }
+                ]}
+              />
+              <EdgeContextMenu
+                contextMenuRef={contextMenuRef}
+                isToggled={edgeContextMenu.toggled}
+                positionX={points.x}
+                positionY={points.y}
+                buttons={[
+                  {
+                    text: "edge button 1",
+                    icon: "",
+                    onClick: () => alert("hello"),
+                  },
+                  {
+                    text: "edge button 2",
+                    icon: "",
+                    onClick: () => alert("wow"),
+                  },
+                  {
+                    text: "edge button 3",
+                    icon: "",
+                    onClick: () => alert("goodbye"),
+                  }
+                ]}
+              />
+              <CanvasContextMenu
+                contextMenuRef={contextMenuRef}
+                isToggled={canvasContextMenu.toggled}
+                positionX={points.x}
+                positionY={points.y}
+                buttons={[
+                  {
+                    text: "canvas button 1",
+                    icon: "",
+                    onClick: () => alert("hello"),
+                  },
+                  {
+                    text: "canvas button 2",
+                    icon: "",
+                    onClick: () => alert("wow"),
+                  },
+                  {
+                    text: "canvas button 3",
+                    icon: "",
+                    onClick: () => alert("goodbye"),
+                  }
+                ]}
               />
             </div>
         </AppContext.Provider>
