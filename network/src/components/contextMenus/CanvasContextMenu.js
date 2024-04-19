@@ -11,7 +11,7 @@ const CanvasContextMenu = ({
     return (
         <menu
             style={{
-                top: positionY + 340 + "px",
+                top: positionY + 150 + "px",
                 left: positionX + 2 + "px"
             }}
             className={`context-menu ${isToggled ? 'active' : ''}`}

@@ -37,6 +37,12 @@ export const AppWrapper = ({children}) => {
         {from: 4, to: 10, label: "Friend"}
     ])
 
+    const [rightClickedNode, setRightClickedNode] = useState(null);
+
+    function resetRightClickedNode() {
+      setRightClickedNode(null);
+    }
+
     let [state, setState] = useState({
       graph: {nodes: nodes, edges: edges},
       events: {
@@ -70,6 +76,7 @@ export const AppWrapper = ({children}) => {
             })
             if (nodeID !== undefined) {
               console.log(`node selected: ${nodeID}`);
+              setRightClickedNode(nodeID)
               resetEdgeContextMenu()
               resetCanvasContextMenu()
               handleNodeOnContextMenu(event)
@@ -308,8 +315,29 @@ export const AppWrapper = ({children}) => {
       }
     })
 
+    const [personDialog, setPersonDialog] = useState(false);
+
+    function closePersonDialog() {
+      setPersonDialog(false);
+    }
+
+    const [orgDialog, setOrgDialog] = useState(false);
+
+    function closeOrgDialog() {
+      setOrgDialog(false);
+    }
+
+    const [linkDialog, setLinkDialog] = useState(false);
+
+    function closeLinkDialog() {
+      setLinkDialog(false);
+    }
+
     return (
-        <AppContext.Provider value = {{state, nodes, edges, addPerson, addOrganization, addEdge}}>
+        <AppContext.Provider value = {{state, nodes, edges, personDialog, 
+                                      orgDialog, rightClickedNode, linkDialog, addPerson, addOrganization, 
+                                      addEdge, closePersonDialog, closeOrgDialog, resetRightClickedNode,
+                                      closeLinkDialog}}>
             {children}
             <div className='container'
             onContextMenu={(e) => {
@@ -328,19 +356,9 @@ export const AppWrapper = ({children}) => {
                 positionY={points.y}
                 buttons={[
                   {
-                    text: "node button 1",
+                    text: "Add Link",
                     icon: "",
-                    onClick: () => alert("hello"),
-                  },
-                  {
-                    text: "node button 2",
-                    icon: "",
-                    onClick: () => alert("wow"),
-                  },
-                  {
-                    text: "node button 3",
-                    icon: "",
-                    onClick: () => alert("goodbye"),
+                    onClick: () => {setLinkDialog(true); resetNodeContextMenu()},
                   }
                 ]}
               />
@@ -374,19 +392,14 @@ export const AppWrapper = ({children}) => {
                 positionY={points.y}
                 buttons={[
                   {
-                    text: "canvas button 1",
+                    text: "Add a Person",
                     icon: "",
-                    onClick: () => alert("hello"),
+                    onClick: () => {setPersonDialog(true); resetCanvasContextMenu()},
                   },
                   {
-                    text: "canvas button 2",
+                    text: "Add an Organization",
                     icon: "",
-                    onClick: () => alert("wow"),
-                  },
-                  {
-                    text: "canvas button 3",
-                    icon: "",
-                    onClick: () => alert("goodbye"),
+                    onClick: () => {setOrgDialog(true); resetCanvasContextMenu()},
                   }
                 ]}
               />
