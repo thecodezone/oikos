@@ -8,5 +8,5 @@ export const options = {
     edges: {
         color: "yellow"
     },
-    height: "520px"
+    height: "700px"
 }

@@ -1,22 +1,36 @@
 import React from 'react';
-import {Button, ButtonGroup, defaultTheme, Provider, TextField } from '@adobe/react-spectrum';
+import {Button, ButtonGroup, defaultTheme, DialogContainer, Provider, TextField, useDialogContainer } from '@adobe/react-spectrum';
 import { Item, ComboBox } from '@adobe/react-spectrum';
-import { Form, ActionButton,  Content, Dialog, DialogTrigger } from '@adobe/react-spectrum';
+import { Form,  Content, Dialog } from '@adobe/react-spectrum';
 import { Heading } from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
 import { AppData } from './components/AppWrapper';
 
-export default function IndividualPrayerForm() {
-  const { addEdge, nodes } = AppData();
-  let sourceOptions = nodes
+export default function AddLinkForm() {
+  const { linkDialog, closeLinkDialog } = AppData();
+
+  return (
+    <Provider theme={defaultTheme}>
+      <ToastContainer />
+      <DialogContainer onDismiss={() => closeLinkDialog()} type='modal'>
+        {linkDialog === true && (
+          <AddLinkDialog />
+        )}
+      </DialogContainer>
+    </Provider>
+  );
+}
+
+function AddLinkDialog() {
+  const { addEdge, nodes, rightClickedNode } = AppData();
   let targetOptions = nodes
-  let [sourceID, setSourceID] = React.useState();
   let [targetID, setTargetID] = React.useState();
   let [relation, setRelation] = React.useState('');
+  let dialog = useDialogContainer();
   
   function isDisabled() 
   {
-    if (sourceID === null || targetID === null || relation === ''){
+    if (targetID === null || relation === ''){
       return true;
     }
     else
@@ -42,42 +56,27 @@ export default function IndividualPrayerForm() {
   };
   
   return (
-    <Provider theme={defaultTheme}>
-      <ToastContainer />
-      <DialogTrigger isDismissable mobileType='tray'>
-        <ActionButton>Add a Link</ActionButton>
-        {( close ) => (
-          <Dialog size="S">
-          <Heading>Link Adder</Heading>
-            <Content>
-              <Form validationBehavior="native" onSubmit={onSubmit} id="link-form">
-                <p>(* is required)</p>
-                <p></p>
-                <ComboBox isRequired
-                    label="Source:"
-                    items={sourceOptions}
-                    onSelectionChange={setSourceID}>
-                    {item => <Item>{item.label}</Item>}
-                </ComboBox>
-                <p></p>
-                <ComboBox isRequired
-                    label="Target:"
-                    items={targetOptions}
-                    onSelectionChange={setTargetID}>
-                    {item => <Item>{item.label}</Item>}
-                </ComboBox>
-                <p></p>
-                <TextField name="relation" value={relation} onChange={setRelation} label="Relation" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
-                <p></p>
-                <ButtonGroup>
-                <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={() => {addEdge(sourceID, targetID, relation); handleClose(); close();}}>Add Link</Button>
-                <Button type="reset" variant="primary" onPress={close}>Cancel</Button>
-                </ButtonGroup>
-              </Form>
-            </Content>
-          </Dialog>
-        )}
-      </DialogTrigger>
-    </Provider>
+    <Dialog size="S">
+    <Heading>Link Adder</Heading>
+      <Content>
+        <Form validationBehavior="native" onSubmit={onSubmit} id="link-form">
+          <p>(* is required)</p>
+          <p></p>
+          <ComboBox isRequired
+              label="Target:"
+              items={targetOptions}
+              onSelectionChange={setTargetID}>
+              {item => <Item>{item.label}</Item>}
+          </ComboBox>
+          <p></p>
+          <TextField name="relation" value={relation} onChange={setRelation} label="Relation" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
+          <p></p>
+          <ButtonGroup>
+          <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={() => {addEdge(rightClickedNode, targetID, relation); handleClose(); dialog.dismiss();}}>Add Link</Button>
+          <Button type="reset" variant="primary" onPress={dialog.dismiss}>Cancel</Button>
+          </ButtonGroup>
+        </Form>
+      </Content>
+    </Dialog>
   );
 }
