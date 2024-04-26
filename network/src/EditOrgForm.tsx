@@ -22,12 +22,12 @@ export default function EditOrgPrayerForm() {
 
 function EditOrgDialog() {
   const { editOrganization, nodes, rightClickedNode } = AppData();
-  let [name, setName] = React.useState(rightClickedNode.getName());
-  let [description, setDescription] = React.useState(rightClickedNode.getDescription());
-  let [website, setWebsite] = React.useState(rightClickedNode.getWebsite());
-  let [request, setRequest] = React.useState(rightClickedNode.getRequest());
-  let [reminder, setReminder] = React.useState(rightClickedNode.getReminder());
-  let [submitted, setSubmitted] = React.useState(null);
+  let [name, setName] = React.useState(rightClickedNode.name);
+  let [description, setDescription] = React.useState(rightClickedNode.description);
+  let [website, setWebsite] = React.useState(rightClickedNode.website);
+  let [request, setRequest] = React.useState(rightClickedNode.request);
+  let [reminder, setReminder] = React.useState(rightClickedNode.reminder);
+  //let [submitted, setSubmitted] = React.useState(null);
   let dialog = useDialogContainer();
 
   function isDisabled() 
@@ -83,7 +83,7 @@ function EditOrgDialog() {
             () => { 
             editOrganization(name, description, website, request, reminder); handleClose();
             dialog.dismiss()}
-          }>Save Changes</Button>
+          }>Save</Button>
           <Button type="reset" variant="primary" onPress={dialog.dismiss}>Cancel</Button>
             <DialogTrigger isDismissable type="popover">
               <Button variant="secondary">ⓘ</Button>

@@ -24,8 +24,8 @@ export default function EditLinkForm() {
 function EditLinkDialog() {
   const { editEdge, nodes, rightClickedEdge } = AppData();
   let targetOptions = nodes
-  let [targetID, setTargetID] = React.useState();
-  let [relation, setRelation] = React.useState('');
+  let [targetID, setTargetID] = React.useState(rightClickedEdge.targetID);
+  let [relation, setRelation] = React.useState(rightClickedEdge.relation);
   let dialog = useDialogContainer();
   
   function isDisabled() 
@@ -65,7 +65,7 @@ function EditLinkDialog() {
           <ComboBox isRequired
               label="Target:"
               items={targetOptions}
-              selectedKey={rightClickedEdge.sourceID}
+              selectedKey={targetID}
               onSelectionChange={setTargetID}>
               {item => <Item>{item.label}</Item>}
           </ComboBox>
@@ -73,7 +73,7 @@ function EditLinkDialog() {
           <TextField name="relation" value={relation} onChange={setRelation} label="Relation" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
           <p></p>
           <ButtonGroup>
-          <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={() => {editEdge(rightClickedEdge, targetID, relation); handleClose(); dialog.dismiss();}}>Save Link</Button>
+          <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={() => {editEdge(rightClickedEdge, targetID, relation); handleClose(); dialog.dismiss();}}>Save</Button>
           <Button type="reset" variant="primary" onPress={dialog.dismiss}>Cancel</Button>
           </ButtonGroup>
         </Form>

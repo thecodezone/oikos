@@ -453,18 +453,12 @@ export const AppWrapper = ({children}) => {
       setEditLinkDialog(false);
     }
 
-    const [listDialog, setListDialog] = useState(false);
-
-    function closeListDialog() {
-      setListDialog(false);
-    }
-
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editPersonDialog,
-                                      orgDialog, editOrgDialog, rightClickedNode, rightClickedEdge, linkDialog, editLinkDialog, listDialog, addPerson, editPerson, addOrganization, 
+                                      orgDialog, editOrgDialog, rightClickedNode, rightClickedEdge, linkDialog, editLinkDialog, addPerson, editPerson, addOrganization, 
                                       editOrganization,
                                       addEdge, editEdge, closePersonDialog, closeEditPersonDialog, closeOrgDialog, closeEditOrgDialog, resetRightClickedNode, resetRightClickedEdge,
-                                      closeLinkDialog, closeEditLinkDialog, closeListDialog}}>
+                                      closeLinkDialog, closeEditLinkDialog}}>
             {children}
             <div className='container'
             onContextMenu={(e) => {
@@ -493,7 +487,7 @@ export const AppWrapper = ({children}) => {
                     onClick: () => {setEditPersonDialog(true); resetNodeContextMenu()},
                   },
                   {
-                    text: "Delete from Map",
+                    text: "Delete",
                     icon: "",
                     onClick: () => alert("Unimplemented method"),
                   }
@@ -506,12 +500,12 @@ export const AppWrapper = ({children}) => {
                 positionY={points.y}
                 buttons={[
                   {
-                    text: "Edit Relationship",
+                    text: "Edit",
                     icon: "",
                     onClick: () => {setEditLinkDialog(true); resetEdgeContextMenu()},
                   },
                   {
-                    text: "Delete Relationship",
+                    text: "Delete",
                     icon: "",
                     onClick: () => alert("Unimplemented method"),
                   }
@@ -532,11 +526,6 @@ export const AppWrapper = ({children}) => {
                     text: "Add an Organization",
                     icon: "",
                     onClick: () => {setOrgDialog(true); resetCanvasContextMenu()},
-                  },
-                  {
-                    text: "List Graph Nodes",
-                    icon: "",
-                    onClick: () => {setListDialog(true); resetCanvasContextMenu()},
                   },
                 ]}
               />

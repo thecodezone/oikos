@@ -24,12 +24,12 @@ export default function EditIndividualPrayerForm() {
 
 function EditPersonDialog() {
   const { editPerson, nodes, rightClickedNode } = AppData();
-  let [name, setName] = React.useState(rightClickedNode.getName());
-  let [phone, setPhone] = React.useState(rightClickedNode.getPhone());
-  let [status, setStatus] = React.useState(rightClickedNode.getStatus());
-  let [request, setRequest] = React.useState(rightClickedNode.getRequest());
-  let [reminder, setReminder] = React.useState(rightClickedNode.getReminder());
-  let [submitted, setSubmitted] = React.useState(null);
+  let [name, setName] = React.useState(rightClickedNode.name);
+  let [phone, setPhone] = React.useState(rightClickedNode.phone);
+  let [status, setStatus] = React.useState(rightClickedNode.status);
+  let [request, setRequest] = React.useState(rightClickedNode.request);
+  let [reminder, setReminder] = React.useState(rightClickedNode.reminder);
+  //let [submitted, setSubmitted] = React.useState(null);
   let dialog = useDialogContainer();
 
   function isDisabled() {
@@ -90,7 +90,7 @@ function EditPersonDialog() {
             <Button type="submit" variant="accent" isDisabled={isDisabled()}
               onPress={() => {editPerson(name, phone, status, request, reminder); 
                               handleClose(); 
-                              dialog.dismiss()}}>Save Changes</Button>
+                              dialog.dismiss()}}>Save</Button>
             <Button type="reset" variant="primary" onPress={dialog.dismiss}>Cancel</Button>
               <DialogTrigger isDismissable type="popover">
                 <Button variant="secondary">ⓘ</Button>

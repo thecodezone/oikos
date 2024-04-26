@@ -7,22 +7,6 @@ import {ToastContainer} from '@react-spectrum/toast'
 import { AppData } from './components/AppWrapper';
 
 export default function ViewListForm() {
-  const { listDialog, closeListDialog } = AppData();
-
-  return (
-    <Provider theme={defaultTheme}>
-      <ToastContainer />
-      <DialogContainer onDismiss={() => closeListDialog()} type='modal'>
-        {listDialog === true && (
-          <ViewListDialog />
-        )}
-      </DialogContainer>
-    </Provider>
-  );
-}
-
-function ViewListDialog() { 
-  let dialog = useDialogContainer();
   const { edges, nodes } = AppData();
   let columns = [
     { name: 'Name', uid: 'from' },
@@ -71,6 +55,11 @@ function ViewListDialog() {
   };
   
   return (
+    <Provider theme={defaultTheme}>
+      <ToastContainer />
+      <DialogTrigger isDismissable mobileType='tray'>
+        <ActionButton>View List</ActionButton>
+        {( close ) => (
           <Dialog size="L">
           <Heading>Graph as List</Heading>
             <Content>
@@ -102,10 +91,13 @@ function ViewListDialog() {
               </TableView>
                 <p></p>
                 <ButtonGroup>
-                <Button type="reset" variant="primary" onPress={dialog.dismiss}>Close</Button>
+                <Button type="reset" variant="primary" onPress={close}>Close</Button>
                 </ButtonGroup>
               </Form>
             </Content>
           </Dialog>
+        )}
+      </DialogTrigger>
+    </Provider>
   );
 }
