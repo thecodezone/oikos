@@ -17,7 +17,6 @@ function App() {
       <OrgPrayerForm />
       <AddLinkForm />
       <ViewListForm />
-      <PrayerMap />
     </div>
   );
 }

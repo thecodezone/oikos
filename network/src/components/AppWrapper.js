@@ -38,9 +38,14 @@ export const AppWrapper = ({children}) => {
     ])
 
     const [rightClickedNode, setRightClickedNode] = useState(null);
+    const [rightClickedEdge, setRightClickedEdge] = useState(null);
 
     function resetRightClickedNode() {
       setRightClickedNode(null);
+    }
+
+    function resetRightClickedEdge() {
+        setRightClickedEdge(null);
     }
 
     let [state, setState] = useState({
@@ -81,15 +86,14 @@ export const AppWrapper = ({children}) => {
               resetCanvasContextMenu()
               handleNodeOnContextMenu(event)
             }
-            else if (edgeID !== undefined)
-            {
+            else if (edgeID !== undefined) {
               console.log(`edge selected: ${edgeID}`);
+              setRightClickedEdge(edgeID)
               resetNodeContextMenu()
               resetCanvasContextMenu()
               handleEdgeOnContextMenu(event)
             }
-            else
-            {
+            else {
               console.log(`canvas background selected`)
               resetNodeContextMenu()
               resetEdgeContextMenu()
@@ -123,6 +127,28 @@ export const AppWrapper = ({children}) => {
       }
     };
 
+    const editPerson = (nodeID, name, phone, status, request, reminder) => {
+        if (name !== '' && status !== '')
+        {
+          name = adjustDuplicateName(name);
+          let nodeShape = "box"
+          if (status === 'believer')
+          {
+              nodeShape = "circle"
+          }
+          const currentPerson = nodes.find(x => x.id === nodeID)
+          const personEntry = {id: currentPerson.getID(), label: name, shape: nodeShape};
+          const arrayCopy = [...nodes]; //creating a copy
+          arrayCopy.push(personEntry);
+          setNodes(arrayCopy);
+          editNodeState(personEntry)
+        }
+        else
+        {
+          ToastQueue.negative('Missing required fields.', {timeout:1500});
+        }
+      };
+
     const addOrganization = (name, description, website, request, reminder) => {
       if (name !== '')
       {
@@ -132,13 +158,30 @@ export const AppWrapper = ({children}) => {
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(orgEntry);
         setNodes(arrayCopy);
-        updateNodeState(orgEntry);
+        editNodeState(orgEntry);
       }
       else
       {
         ToastQueue.negative('Missing required fields.', {timeout:1500});
       }
     }
+
+    const editOrganization = (nodeID, name, description, website, request, reminder) => {
+        if (name !== '')
+        {
+          name = adjustDuplicateName(name);
+          const currentOrg = nodes.find(x => x.id === nodeID)
+          const orgEntry = {id: currentOrg.getID(), label: name, shape: "box"};
+          const arrayCopy = [...nodes]; //creating a copy
+          arrayCopy.push(orgEntry);
+          setNodes(arrayCopy);
+          editNodeState(orgEntry);
+        }
+        else
+        {
+          ToastQueue.negative('Missing required fields.', {timeout:1500});
+        }
+      }
 
     const adjustDuplicateName = (name) => {
       let duplicateExists = false;
@@ -186,6 +229,25 @@ export const AppWrapper = ({children}) => {
       ToastQueue.positive(node.label + ' successfully added to map', {timeout:1500});
     };
 
+    const editNodeState = (node) => {
+        // updates the nodes in the state with the new node
+        setState(({ graph: { nodes, edges }, ...rest }) => {
+            return {
+              graph: {
+                nodes: [
+                  ...nodes,
+                  node
+                ],
+                edges: [
+                  ...edges
+                ]
+              },
+              ...rest
+            }
+        });
+        ToastQueue.positive(node.label + ' has been updated successfully', {timeout:1500});
+      };
+
     const addEdge = (sourceID, targetID, label) => {
         if (sourceID !== null && targetID !== null && label !== '')
         {
@@ -213,6 +275,46 @@ export const AppWrapper = ({children}) => {
                     edges: [
                       ...edges,
                       newEdge
+                    ]
+                  },
+                  ...rest
+                }
+            });
+            ToastQueue.positive('Successfully added link.', {timeout:1500});
+        }
+        else
+        {
+            ToastQueue.negative('Missing required fields.', {timeout:1500});
+        }
+    }
+
+    const editEdge = (sourceID, targetID, label) => {
+        if (sourceID !== null && targetID !== null && label !== '')
+        {
+            for (let i = 0; i<edges.length; i++)
+            {
+                if (edges[i].from === sourceID && edges[i].to === targetID)
+                {
+                    ToastQueue.info('Edge from ' + nodes.find(x => x.id === sourceID).label + 
+                    ' to ' + nodes.find(x => x.id === targetID).label + ' already exists.', {timeout:1500})
+                    return;
+                }
+            }
+            // updates the edges array
+            const currentEdge = edges.find(x => x.id === sourceID)
+            const arrayCopy = [...edges];
+            arrayCopy.push(currentEdge);
+            setEdges(arrayCopy);
+            // updates the edges in the state with the new edge
+            setState(({ graph: { nodes, edges }, ...rest }) => {
+                return {
+                  graph: {
+                    nodes: [
+                      ...nodes
+                    ],
+                    edges: [
+                      ...edges,
+                      currentEdge
                     ]
                   },
                   ...rest
@@ -321,10 +423,22 @@ export const AppWrapper = ({children}) => {
       setPersonDialog(false);
     }
 
+    const [editPersonDialog, setEditPersonDialog] = useState(false);
+
+    function closeEditPersonDialog() {
+      setEditPersonDialog(false);
+    }
+
     const [orgDialog, setOrgDialog] = useState(false);
 
     function closeOrgDialog() {
       setOrgDialog(false);
+    }
+
+    const [editOrgDialog, setEditOrgDialog] = useState(false);
+
+    function closeEditOrgDialog() {
+      setEditOrgDialog(false);
     }
 
     const [linkDialog, setLinkDialog] = useState(false);
@@ -333,11 +447,24 @@ export const AppWrapper = ({children}) => {
       setLinkDialog(false);
     }
 
+    const [editLinkDialog, setEditLinkDialog] = useState(false);
+
+    function closeEditLinkDialog() {
+      setEditLinkDialog(false);
+    }
+
+    const [listDialog, setListDialog] = useState(false);
+
+    function closeListDialog() {
+      setListDialog(false);
+    }
+
     return (
-        <AppContext.Provider value = {{state, nodes, edges, personDialog, 
-                                      orgDialog, rightClickedNode, linkDialog, addPerson, addOrganization, 
-                                      addEdge, closePersonDialog, closeOrgDialog, resetRightClickedNode,
-                                      closeLinkDialog}}>
+        <AppContext.Provider value = {{state, nodes, edges, personDialog, editPersonDialog,
+                                      orgDialog, editOrgDialog, rightClickedNode, rightClickedEdge, linkDialog, editLinkDialog, listDialog, addPerson, editPerson, addOrganization, 
+                                      editOrganization,
+                                      addEdge, editEdge, closePersonDialog, closeEditPersonDialog, closeOrgDialog, closeEditOrgDialog, resetRightClickedNode, resetRightClickedEdge,
+                                      closeLinkDialog, closeEditLinkDialog, closeListDialog}}>
             {children}
             <div className='container'
             onContextMenu={(e) => {
@@ -359,6 +486,16 @@ export const AppWrapper = ({children}) => {
                     text: "Add Link",
                     icon: "",
                     onClick: () => {setLinkDialog(true); resetNodeContextMenu()},
+                  },
+                  {
+                    text: "Edit Info",
+                    icon: "",
+                    onClick: () => {setEditPersonDialog(true); resetNodeContextMenu()},
+                  },
+                  {
+                    text: "Delete from Map",
+                    icon: "",
+                    onClick: () => alert("Unimplemented method"),
                   }
                 ]}
               />
@@ -369,19 +506,14 @@ export const AppWrapper = ({children}) => {
                 positionY={points.y}
                 buttons={[
                   {
-                    text: "edge button 1",
+                    text: "Edit Relationship",
                     icon: "",
-                    onClick: () => alert("hello"),
+                    onClick: () => {setEditLinkDialog(true); resetEdgeContextMenu()},
                   },
                   {
-                    text: "edge button 2",
+                    text: "Delete Relationship",
                     icon: "",
-                    onClick: () => alert("wow"),
-                  },
-                  {
-                    text: "edge button 3",
-                    icon: "",
-                    onClick: () => alert("goodbye"),
+                    onClick: () => alert("Unimplemented method"),
                   }
                 ]}
               />
@@ -400,7 +532,12 @@ export const AppWrapper = ({children}) => {
                     text: "Add an Organization",
                     icon: "",
                     onClick: () => {setOrgDialog(true); resetCanvasContextMenu()},
-                  }
+                  },
+                  {
+                    text: "List Graph Nodes",
+                    icon: "",
+                    onClick: () => {setListDialog(true); resetCanvasContextMenu()},
+                  },
                 ]}
               />
             </div>
