@@ -129,13 +129,16 @@ export const AppWrapper = ({children}) => {
     const editPerson = (name, phone, status, request, reminder) => {
         if (name !== '' && status !== '')
         {
-          name = adjustDuplicateName(name);
+          const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo
+          if (currentPerson.getName() !== name)
+          {
+            name = adjustDuplicateName(name);
+          }
           let nodeShape = "box"
           if (status === 'believer')
           {
               nodeShape = "circle"
           }
-          const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo
           currentPerson.setName(name)
           currentPerson.setPhone(phone)
           currentPerson.setStatus(status)
@@ -144,7 +147,8 @@ export const AppWrapper = ({children}) => {
           console.log(currentPerson.getName())
           const personEntry = {id: currentPerson.getID(), label: currentPerson.getName(), shape: nodeShape, nodeInfo: currentPerson};
           const arrayCopy = [...nodes]; //creating a copy
-          arrayCopy.push(personEntry);
+          let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
+          arrayCopy[nodeIndex] = personEntry
           setNodes(arrayCopy);
           console.log(nodes)
         }
