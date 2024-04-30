@@ -115,11 +115,10 @@ export const AppWrapper = ({children}) => {
             nodeShape = "circle"
         }
         const newPerson = new Person(name, phone, status, request, reminder)
-        const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape};
+        const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
         setNodes(arrayCopy);
-        updateNodeState(personEntry)
       }
       else
       {
@@ -127,7 +126,7 @@ export const AppWrapper = ({children}) => {
       }
     };
 
-    const editPerson = (nodeID, name, phone, status, request, reminder) => {
+    const editPerson = (name, phone, status, request, reminder) => {
         if (name !== '' && status !== '')
         {
           name = adjustDuplicateName(name);
@@ -136,12 +135,18 @@ export const AppWrapper = ({children}) => {
           {
               nodeShape = "circle"
           }
-          const currentPerson = nodes.find(x => x.id === nodeID)
-          const personEntry = {id: currentPerson.getID(), label: name, shape: nodeShape};
+          const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo
+          currentPerson.setName(name)
+          currentPerson.setPhone(phone)
+          currentPerson.setStatus(status)
+          currentPerson.setRequest(request)
+          currentPerson.setReminder(reminder)
+          console.log(currentPerson.getName())
+          const personEntry = {id: currentPerson.getID(), label: currentPerson.getName(), shape: nodeShape, nodeInfo: currentPerson};
           const arrayCopy = [...nodes]; //creating a copy
           arrayCopy.push(personEntry);
           setNodes(arrayCopy);
-          editNodeState(personEntry)
+          console.log(nodes)
         }
         else
         {
@@ -158,7 +163,6 @@ export const AppWrapper = ({children}) => {
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(orgEntry);
         setNodes(arrayCopy);
-        editNodeState(orgEntry);
       }
       else
       {
@@ -175,7 +179,6 @@ export const AppWrapper = ({children}) => {
           const arrayCopy = [...nodes]; //creating a copy
           arrayCopy.push(orgEntry);
           setNodes(arrayCopy);
-          editNodeState(orgEntry);
         }
         else
         {
@@ -210,44 +213,66 @@ export const AppWrapper = ({children}) => {
       }
     }
 
-    const updateNodeState = (node) => {
-      // updates the nodes in the state with the new node
-      setState(({ graph: { nodes, edges }, ...rest }) => {
-          return {
-            graph: {
-              nodes: [
-                ...nodes,
-                node
-              ],
-              edges: [
-                ...edges
-              ]
+      useEffect(() => {
+        setState({
+          graph: {nodes: nodes, edges: edges},
+          events: {
+            select: ({ nodes, edges }) => {
+              //console.log("Selected nodes:");
+              //console.log(nodes);
+              //console.log("Selected edges:");
+              //console.log(edges);
+              //alert("Selected node: " + nodes);
             },
-            ...rest
-          }
-      });
-      ToastQueue.positive(node.label + ' successfully added to map', {timeout:1500});
-    };
-
-    const editNodeState = (node) => {
-        // updates the nodes in the state with the new node
-        setState(({ graph: { nodes, edges }, ...rest }) => {
-            return {
-              graph: {
-                nodes: [
-                  ...nodes,
-                  node
-                ],
-                edges: [
-                  ...edges
-                ]
-              },
-              ...rest
+            doubleClick: ({ pointer: { canvas } }) => {
+              //AlertDialog();
+            },
+            oncontext: (event) => {
+              // redraw needed for event pointer to work (unexplained as to why)
+              state.network.redraw();
+              let nodeID = state.network.getNodeAt(event.pointer.DOM);
+              let edgeID = state.network.getEdgeAt( event.pointer.DOM );
+              const contextMenuAttr = contextMenuRef.current.getBoundingClientRect()
+              const isLeft = event.pointer.DOM.x < window?.innerWidth / 2
+              let xPos = event.pointer.DOM.x
+              let yPos = event.pointer.DOM.y
+  
+              if (!isLeft) {
+                xPos = xPos - contextMenuAttr.width
+              }
+  
+              setPoints({
+                x: xPos,
+                y: yPos,
+              })
+              if (nodeID !== undefined) {
+                console.log(`node selected: ${nodeID}`);
+                setRightClickedNode(nodeID)
+                resetEdgeContextMenu()
+                resetCanvasContextMenu()
+                handleNodeOnContextMenu(event)
+              }
+              else if (edgeID !== undefined)
+              {
+                console.log(`edge selected: ${edgeID}`);
+                resetNodeContextMenu()
+                resetCanvasContextMenu()
+                handleEdgeOnContextMenu(event)
+              }
+              else
+              {
+                console.log(`canvas background selected`)
+                resetNodeContextMenu()
+                resetEdgeContextMenu()
+                handleCanvasOnContextMenu(event)
+              }
             }
-        });
-        ToastQueue.positive(node.label + ' has been updated successfully', {timeout:1500});
-      };
-
+          },
+          network: state.network
+        })
+    
+    }, [nodes,edges]);
+  
     const addEdge = (sourceID, targetID, label) => {
         if (sourceID !== null && targetID !== null && label !== '')
         {

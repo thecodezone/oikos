@@ -24,11 +24,12 @@ export default function EditIndividualPrayerForm() {
 
 function EditPersonDialog() {
   const { editPerson, nodes, rightClickedNode } = AppData();
-  let [name, setName] = React.useState(rightClickedNode.name);
-  let [phone, setPhone] = React.useState(rightClickedNode.phone);
-  let [status, setStatus] = React.useState(rightClickedNode.status);
-  let [request, setRequest] = React.useState(rightClickedNode.request);
-  let [reminder, setReminder] = React.useState(rightClickedNode.reminder);
+  const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo
+  let [name, setName] = React.useState(currentPerson.getName());
+  let [phone, setPhone] = React.useState(currentPerson.getPhone());
+  let [status, setStatus] = React.useState(currentPerson.getStatus());
+  let [request, setRequest] = React.useState(currentPerson.getRequest());
+  let [reminder, setReminder] = React.useState(currentPerson.getReminder());
   //let [submitted, setSubmitted] = React.useState(null);
   let dialog = useDialogContainer();
 
