@@ -22,10 +22,11 @@ export default function EditLinkForm() {
 }
 
 function EditLinkDialog() {
-  const { editEdge, nodes, rightClickedEdge } = AppData();
+  const { editEdge, nodes, edges, rightClickedEdge } = AppData();
+  const currentEdge = edges.find(x => x.id === rightClickedEdge)
   let targetOptions = nodes
   let [targetID, setTargetID] = React.useState(rightClickedEdge.targetID);
-  let [relation, setRelation] = React.useState(rightClickedEdge.relation);
+  let [relation, setRelation] = React.useState(rightClickedEdge.sourceID);
   let dialog = useDialogContainer();
   
   function isDisabled() 

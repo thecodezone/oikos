@@ -22,11 +22,12 @@ export default function EditOrgPrayerForm() {
 
 function EditOrgDialog() {
   const { editOrganization, nodes, rightClickedNode } = AppData();
-  let [name, setName] = React.useState(rightClickedNode.name);
-  let [description, setDescription] = React.useState(rightClickedNode.description);
-  let [website, setWebsite] = React.useState(rightClickedNode.website);
-  let [request, setRequest] = React.useState(rightClickedNode.request);
-  let [reminder, setReminder] = React.useState(rightClickedNode.reminder);
+  const currentOrganization = nodes.find(x => x.id === rightClickedNode).nodeInfo
+  let [name, setName] = React.useState(currentOrganization.getName());
+  let [description, setDescription] = React.useState(currentOrganization.getDescription());
+  let [website, setWebsite] = React.useState(currentOrganization.getWebsite());
+  let [request, setRequest] = React.useState(currentOrganization.getRequest());
+  let [reminder, setReminder] = React.useState(currentOrganization.getReminder());
   //let [submitted, setSubmitted] = React.useState(null);
   let dialog = useDialogContainer();
 

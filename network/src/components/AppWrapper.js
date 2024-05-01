@@ -174,15 +174,27 @@ export const AppWrapper = ({children}) => {
       }
     }
 
-    const editOrganization = (nodeID, name, description, website, request, reminder) => {
+    const editOrganization = (name, description, website, request, reminder) => {
         if (name !== '')
         {
-          name = adjustDuplicateName(name);
-          const currentOrg = nodes.find(x => x.id === nodeID)
-          const orgEntry = {id: currentOrg.getID(), label: name, shape: "box"};
+          const currentOrganization = nodes.find(x => x.id === rightClickedNode).nodeInfo
+          if (currentOrganization.getName() !== name)
+          {
+            name = adjustDuplicateName(name);
+          }
+          let nodeShape = "triangle"
+          currentOrganization.setName(name)
+          currentOrganization.setDescription(description)
+          currentOrganization.setWebsite(website)
+          currentOrganization.setRequest(request)
+          currentOrganization.setReminder(reminder)
+          console.log(currentOrganization.getName())
+          const orgEntry = {id: currentOrganization.getID(), label: currentOrganization.getName(), shape: nodeShape, nodeInfo: currentOrganization};
           const arrayCopy = [...nodes]; //creating a copy
-          arrayCopy.push(orgEntry);
+          let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
+          arrayCopy[nodeIndex] = orgEntry
           setNodes(arrayCopy);
+          console.log(nodes)
         }
         else
         {
@@ -330,9 +342,10 @@ export const AppWrapper = ({children}) => {
                 }
             }
             // updates the edges array
-            const currentEdge = edges.find(x => x.id === sourceID)
+            //const currentEdge = edges.find(x => x.id === rightClickedEdge)
+            const sameEdge = {from: sourceID, to: targetID, label: label};
             const arrayCopy = [...edges];
-            arrayCopy.push(currentEdge);
+            arrayCopy.push(sameEdge);
             setEdges(arrayCopy);
             // updates the edges in the state with the new edge
             setState(({ graph: { nodes, edges }, ...rest }) => {
@@ -343,7 +356,7 @@ export const AppWrapper = ({children}) => {
                     ],
                     edges: [
                       ...edges,
-                      currentEdge
+                      sameEdge
                     ]
                   },
                   ...rest
