@@ -7,6 +7,7 @@ import { options } from './options';
 import NodeContextMenu from "./contextMenus/NodeContextMenu";
 import EdgeContextMenu from "./contextMenus/EdgeContextMenu";
 import CanvasContextMenu from "./contextMenus/CanvasContextMenu";
+import { v4 as uuidv4 } from 'uuid'
 
 const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
@@ -26,19 +27,20 @@ export const AppWrapper = ({children}) => {
         {id: 10, label: "Joya", shape: "box"}
     ])
     const [edges, setEdges] = useState([
-        {from: 1, to: 2, label: "Uncle"},
-        {from: 2, to: 3, label: "Wife"},
-        {from: 1, to: 4, label: "Mother"},
-        {from: 1, to: 5, label: "Friend"},
-        {from: 1, to: 6, label: "Friend"},
-        {from: 1, to: 7, label: "Friend"},
-        {from: 3, to: 8, label: "Child"},
-        {from: 3, to: 9, label: "Child"},
-        {from: 4, to: 10, label: "Friend"}
+        {id: 1, from: 1, to: 2, label: "Uncle"},
+        {id: 2, from: 2, to: 3, label: "Wife"},
+        {id: 3, from: 1, to: 4, label: "Mother"},
+        {id: 4, from: 1, to: 5, label: "Friend"},
+        {id: 5, from: 1, to: 6, label: "Friend"},
+        {id: 6, from: 1, to: 7, label: "Friend"},
+        {id: 7, from: 3, to: 8, label: "Child"},
+        {id: 8, from: 3, to: 9, label: "Child"},
+        {id: 9, from: 4, to: 10, label: "Friend"}
     ])
 
     const [rightClickedNode, setRightClickedNode] = useState(null);
     const [rightClickedEdge, setRightClickedEdge] = useState(null);
+    const [selectedNodeType, setSelectedNodeType] = useState(null);
 
     function resetRightClickedNode() {
       setRightClickedNode(null);
@@ -82,6 +84,19 @@ export const AppWrapper = ({children}) => {
             if (nodeID !== undefined) {
               console.log(`node selected: ${nodeID}`);
               setRightClickedNode(nodeID)
+              const currentNodeType = nodes.find(x => x.id === nodeID).nodeInfo
+              if (currentNodeType !== undefined)
+              {
+                if (currentNodeType instanceof Person) 
+                {
+                  setSelectedNodeType('person')
+                }
+                else
+                {
+                  setSelectedNodeType('organization')
+                }
+              }
+              console.log(selectedNodeType)
               resetEdgeContextMenu()
               resetCanvasContextMenu()
               handleNodeOnContextMenu(event)
@@ -163,7 +178,7 @@ export const AppWrapper = ({children}) => {
       {
         name = adjustDuplicateName(name);
         const newOrg = new Organization(name, description, website, request, reminder)
-        const orgEntry = {id: newOrg.getID(), label: name, shape: "box"};
+        const orgEntry = {id: newOrg.getID(), label: name, shape: "box", nodeInfo: newOrg};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(orgEntry);
         setNodes(arrayCopy);
@@ -177,19 +192,19 @@ export const AppWrapper = ({children}) => {
     const editOrganization = (name, description, website, request, reminder) => {
         if (name !== '')
         {
-          const currentOrganization = nodes.find(x => x.id === rightClickedNode).nodeInfo
+          const currentNode = nodes.find(x => x.id === rightClickedNode)
+          const currentOrganization = currentNode.nodeInfo
           if (currentOrganization.getName() !== name)
           {
             name = adjustDuplicateName(name);
           }
-          let nodeShape = "triangle"
           currentOrganization.setName(name)
           currentOrganization.setDescription(description)
           currentOrganization.setWebsite(website)
           currentOrganization.setRequest(request)
           currentOrganization.setReminder(reminder)
           console.log(currentOrganization.getName())
-          const orgEntry = {id: currentOrganization.getID(), label: currentOrganization.getName(), shape: nodeShape, nodeInfo: currentOrganization};
+          const orgEntry = {id: currentOrganization.getID(), label: currentOrganization.getName(), shape: currentNode.shape, nodeInfo: currentOrganization};
           const arrayCopy = [...nodes]; //creating a copy
           let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
           arrayCopy[nodeIndex] = orgEntry
@@ -264,6 +279,20 @@ export const AppWrapper = ({children}) => {
               if (nodeID !== undefined) {
                 console.log(`node selected: ${nodeID}`);
                 setRightClickedNode(nodeID)
+                const currentNodeType = nodes.find(x => x.id === nodeID).nodeInfo
+                console.log(nodes.find(x => x.id === nodeID))
+                if (currentNodeType !== undefined)
+                {
+                  if (currentNodeType instanceof Person) 
+                  {
+                    setSelectedNodeType('person')
+                  }
+                  else
+                  {
+                    setSelectedNodeType('organization')
+                  }
+                }
+                console.log(selectedNodeType)
                 resetEdgeContextMenu()
                 resetCanvasContextMenu()
                 handleNodeOnContextMenu(event)
@@ -271,6 +300,7 @@ export const AppWrapper = ({children}) => {
               else if (edgeID !== undefined)
               {
                 console.log(`edge selected: ${edgeID}`);
+                setRightClickedEdge(edgeID)
                 resetNodeContextMenu()
                 resetCanvasContextMenu()
                 handleEdgeOnContextMenu(event)
@@ -302,7 +332,7 @@ export const AppWrapper = ({children}) => {
                 }
             }
             // updates the edges array
-            const newEdge = {from: sourceID, to: targetID, label: label};
+            const newEdge = {id: uuidv4(), from: sourceID, to: targetID, label: label};
             const arrayCopy = [...edges];
             arrayCopy.push(newEdge);
             setEdges(arrayCopy);
@@ -329,39 +359,27 @@ export const AppWrapper = ({children}) => {
         }
     }
 
-    const editEdge = (sourceID, targetID, label) => {
-        if (sourceID !== null && targetID !== null && label !== '')
+    const editEdge = (targetID, label) => {
+        const currentEdge = edges.find(x => x.id === rightClickedEdge)
+        if (targetID !== null && label !== '')
         {
             for (let i = 0; i<edges.length; i++)
             {
-                if (edges[i].from === sourceID && edges[i].to === targetID)
+                if (edges[i].from === currentEdge.from && edges[i].to === targetID)
                 {
-                    ToastQueue.info('Edge from ' + nodes.find(x => x.id === sourceID).label + 
+                    const source = nodes.find(x => x.id === currentEdge.from)
+                    ToastQueue.info('Edge from ' + source.label + 
                     ' to ' + nodes.find(x => x.id === targetID).label + ' already exists.', {timeout:1500})
                     return;
                 }
             }
             // updates the edges array
-            //const currentEdge = edges.find(x => x.id === rightClickedEdge)
-            const sameEdge = {from: sourceID, to: targetID, label: label};
+            const sameEdge = {id: currentEdge.id, from: currentEdge.from, to: targetID, label: label};
             const arrayCopy = [...edges];
-            arrayCopy.push(sameEdge);
+            let edgeIndex = nodes.findIndex(obj => obj.id === rightClickedEdge)
+            arrayCopy[edgeIndex] = sameEdge
             setEdges(arrayCopy);
-            // updates the edges in the state with the new edge
-            setState(({ graph: { nodes, edges }, ...rest }) => {
-                return {
-                  graph: {
-                    nodes: [
-                      ...nodes
-                    ],
-                    edges: [
-                      ...edges,
-                      sameEdge
-                    ]
-                  },
-                  ...rest
-                }
-            });
+            console.log(edges)
             ToastQueue.positive('Successfully added link.', {timeout:1500});
         }
         else
@@ -465,22 +483,16 @@ export const AppWrapper = ({children}) => {
       setPersonDialog(false);
     }
 
-    const [editPersonDialog, setEditPersonDialog] = useState(false);
+    const [editNodeDialog, setEditNodeDialog] = useState(false);
 
-    function closeEditPersonDialog() {
-      setEditPersonDialog(false);
+    function closeEditNodeDialog() {
+      setEditNodeDialog(false);
     }
 
     const [orgDialog, setOrgDialog] = useState(false);
 
     function closeOrgDialog() {
       setOrgDialog(false);
-    }
-
-    const [editOrgDialog, setEditOrgDialog] = useState(false);
-
-    function closeEditOrgDialog() {
-      setEditOrgDialog(false);
     }
 
     const [linkDialog, setLinkDialog] = useState(false);
@@ -496,10 +508,11 @@ export const AppWrapper = ({children}) => {
     }
 
     return (
-        <AppContext.Provider value = {{state, nodes, edges, personDialog, editPersonDialog,
-                                      orgDialog, editOrgDialog, rightClickedNode, rightClickedEdge, linkDialog, editLinkDialog, addPerson, editPerson, addOrganization, 
-                                      editOrganization,
-                                      addEdge, editEdge, closePersonDialog, closeEditPersonDialog, closeOrgDialog, closeEditOrgDialog, resetRightClickedNode, resetRightClickedEdge,
+        <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
+                                      orgDialog, rightClickedNode, rightClickedEdge, 
+                                      linkDialog, editLinkDialog, selectedNodeType, addPerson, editPerson, addOrganization, 
+                                      editOrganization, addEdge, editEdge, closePersonDialog, closeEditNodeDialog, 
+                                      closeOrgDialog, resetRightClickedNode, resetRightClickedEdge,
                                       closeLinkDialog, closeEditLinkDialog}}>
             {children}
             <div className='container'
@@ -526,7 +539,7 @@ export const AppWrapper = ({children}) => {
                   {
                     text: "Edit Info",
                     icon: "",
-                    onClick: () => {setEditPersonDialog(true); resetNodeContextMenu()},
+                    onClick: () => {setEditNodeDialog(true); resetNodeContextMenu()},
                   },
                   {
                     text: "Delete",

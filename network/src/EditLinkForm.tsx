@@ -25,8 +25,8 @@ function EditLinkDialog() {
   const { editEdge, nodes, edges, rightClickedEdge } = AppData();
   const currentEdge = edges.find(x => x.id === rightClickedEdge)
   let targetOptions = nodes
-  let [targetID, setTargetID] = React.useState(rightClickedEdge.targetID);
-  let [relation, setRelation] = React.useState(rightClickedEdge.sourceID);
+  let [targetID, setTargetID] = React.useState(currentEdge.to);
+  let [relation, setRelation] = React.useState(currentEdge.label);
   let dialog = useDialogContainer();
   
   function isDisabled() 
@@ -74,7 +74,7 @@ function EditLinkDialog() {
           <TextField name="relation" value={relation} onChange={setRelation} label="Relation" isQuiet isRequired necessityIndicator="icon" labelPosition="top" width="size-3000" maxWidth="100%"/>
           <p></p>
           <ButtonGroup>
-          <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={() => {editEdge(rightClickedEdge, targetID, relation); handleClose(); dialog.dismiss();}}>Save</Button>
+          <Button type="submit" variant="accent" isDisabled={isDisabled()} onPress={() => {editEdge(targetID, relation); handleClose(); dialog.dismiss();}}>Save</Button>
           <Button type="reset" variant="primary" onPress={dialog.dismiss}>Cancel</Button>
           </ButtonGroup>
         </Form>

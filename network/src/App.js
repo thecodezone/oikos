@@ -4,8 +4,7 @@ import OrgPrayerForm from './AddOrgForm.tsx';
 import { Header } from './Header';
 import AddLinkForm from './AddLinkForm.tsx';
 import ViewListForm from './listForm.tsx';
-import EditIndividualPrayerForm from './EditPersonForm.tsx';
-import EditOrgPrayerForm from './EditOrgForm.tsx';
+import EditNodeForm from './EditNodeForm.tsx';
 import EditLinkForm from './EditLinkForm.tsx';
 
 function App() {
@@ -19,8 +18,7 @@ function App() {
       <IndividualPrayerForm />
       <OrgPrayerForm />
       <AddLinkForm />
-      <EditIndividualPrayerForm/>
-      <EditOrgPrayerForm/>
+      <EditNodeForm/>
       <EditLinkForm/>
       <ViewListForm />
     </div>
