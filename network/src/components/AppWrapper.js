@@ -395,7 +395,7 @@ export const AppWrapper = ({children}) => {
                 buttons={[
                   {
                     text: "Add Link",
-                    icon: "",
+                    icon: "➕",
                     onClick: () => {setLinkDialog(true); resetNodeContextMenu()},
                   },
                   {
