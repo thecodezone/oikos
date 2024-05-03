@@ -38,9 +38,14 @@ export const AppWrapper = ({children}) => {
     ])
 
     const [rightClickedNode, setRightClickedNode] = useState(null);
+    const [rightClickedEdge, setRightClickedEdge] = useState(null);
 
     function resetRightClickedNode() {
       setRightClickedNode(null);
+    }
+  
+    function resetRightClickedEdge() {
+      setRightClickedEdge(null);
     }
 
     let [state, setState] = useState({
@@ -77,6 +82,7 @@ export const AppWrapper = ({children}) => {
             if (nodeID !== undefined) {
               console.log(`node selected: ${nodeID}`);
               setRightClickedNode(nodeID)
+              resetRightClickedEdge()
               resetEdgeContextMenu()
               resetCanvasContextMenu()
               handleNodeOnContextMenu(event)
@@ -84,6 +90,8 @@ export const AppWrapper = ({children}) => {
             else if (edgeID !== undefined)
             {
               console.log(`edge selected: ${edgeID}`);
+              setRightClickedEdge(edgeID)
+              resetRightClickedNode()
               resetNodeContextMenu()
               resetCanvasContextMenu()
               handleEdgeOnContextMenu(event)
@@ -91,6 +99,8 @@ export const AppWrapper = ({children}) => {
             else
             {
               console.log(`canvas background selected`)
+              resetRightClickedNode()
+              resetRightClickedEdge()
               resetNodeContextMenu()
               resetEdgeContextMenu()
               handleCanvasOnContextMenu(event)
@@ -240,6 +250,34 @@ export const AppWrapper = ({children}) => {
             ToastQueue.negative('Missing required fields.', {timeout:1500});
         }
     }
+  
+    const deleteNode = (nodeID) => {
+      const updatedNodes = nodes.filter(node => node.id !== nodeID);
+      const updatedEdges = edges.filter(edge => edge.from !== nodeID && edge.to !== nodeID);
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
+      setState(prevState => ({
+        ...prevState,
+        graph: {
+          nodes: updatedNodes,
+          edges: updatedEdges
+        }
+      }));
+      ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
+    };
+
+    const deleteEdge = (edgeID) => {
+      const updatedEdges = edges.filter(edge => edge.id !== edgeID);
+      setEdges(updatedEdges);
+      setState(prevState => ({
+        ...prevState,
+        graph: {
+          ...prevState.graph,
+          edges: updatedEdges
+        }
+      }));
+      ToastQueue.positive('Edge deleted successfully.', {timeout: 1500});
+    };
 
     const setNetworkInstance = nw => {
       state.network = nw;
@@ -445,9 +483,9 @@ export const AppWrapper = ({children}) => {
 
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, 
-                                      orgDialog, rightClickedNode, linkDialog, propertiesDialog, addPerson, addOrganization, 
-                                      addEdge, closePersonDialog, closeOrgDialog, resetRightClickedNode,
-                                      closeLinkDialog, closePropertiesDialog, updateColorAndShape}}>
+                                      orgDialog, rightClickedNode, rightClickedEdge, linkDialog, propertiesDialog, addPerson, addOrganization, 
+                                      addEdge, closePersonDialog, closeOrgDialog, resetRightClickedNode, resetRightClickedEdge,
+                                      closeLinkDialog, closePropertiesDialog, updateColorAndShape, deleteNode, deleteEdge}}>
             {children}
             <div className='container'
             onContextMenu={(e) => {
@@ -467,13 +505,18 @@ export const AppWrapper = ({children}) => {
                 buttons={[
                   {
                     text: "Add Link",
-                    icon: "",
+                    icon: "➕",
                     onClick: () => {setLinkDialog(true); resetNodeContextMenu()},
                   },
                   {
                     text: "Properties",
                     icon:"",
                     onClick: () => {setPropertiesDialog(true); resetNodeContextMenu()},
+                  },
+                  {
+                    text: "Delete Node",
+                    icon: "",
+                    onClick: () => {deleteNode(rightClickedNode); resetNodeContextMenu()},
                   }
                 ]}
               />
@@ -484,9 +527,9 @@ export const AppWrapper = ({children}) => {
                 positionY={points.y}
                 buttons={[
                   {
-                    text: "edge button 1",
+                    text: "Delete Edge",
                     icon: "",
-                    onClick: () => alert("hello"),
+                    onClick: () => {deleteEdge(rightClickedEdge); resetEdgeContextMenu()},
                   },
                   {
                     text: "edge button 2",
