@@ -6,6 +6,7 @@ import AddLinkForm from './AddLinkForm.tsx';
 import ViewListForm from './listForm.tsx';
 import EditNodeForm from './EditNodeForm.tsx';
 import EditLinkForm from './EditLinkForm.tsx';
+import CustomNodeForm from './CustomNode.tsx';
 
 function App() {
   console.log("script started")
@@ -21,6 +22,7 @@ function App() {
       <EditNodeForm/>
       <EditLinkForm/>
       <ViewListForm />
+      <CustomNodeForm />
     </div>
   );
 }

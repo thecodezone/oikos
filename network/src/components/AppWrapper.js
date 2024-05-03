@@ -45,6 +45,10 @@ export const AppWrapper = ({children}) => {
     function resetRightClickedNode() {
       setRightClickedNode(null);
     }
+  
+    function resetRightClickedEdge() {
+      setRightClickedEdge(null);
+    }
 
     function resetRightClickedEdge() {
         setRightClickedEdge(null);
@@ -97,6 +101,7 @@ export const AppWrapper = ({children}) => {
                 }
               }
               console.log(selectedNodeType)
+              resetRightClickedEdge()
               resetEdgeContextMenu()
               resetCanvasContextMenu()
               handleNodeOnContextMenu(event)
@@ -104,12 +109,15 @@ export const AppWrapper = ({children}) => {
             else if (edgeID !== undefined) {
               console.log(`edge selected: ${edgeID}`);
               setRightClickedEdge(edgeID)
+              resetRightClickedNode()
               resetNodeContextMenu()
               resetCanvasContextMenu()
               handleEdgeOnContextMenu(event)
             }
             else {
               console.log(`canvas background selected`)
+              resetRightClickedNode()
+              resetRightClickedEdge()
               resetNodeContextMenu()
               resetEdgeContextMenu()
               handleCanvasOnContextMenu(event)
@@ -358,6 +366,34 @@ export const AppWrapper = ({children}) => {
             ToastQueue.negative('Missing required fields.', {timeout:1500});
         }
     }
+  
+    const deleteNode = (nodeID) => {
+      const updatedNodes = nodes.filter(node => node.id !== nodeID);
+      const updatedEdges = edges.filter(edge => edge.from !== nodeID && edge.to !== nodeID);
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
+      setState(prevState => ({
+        ...prevState,
+        graph: {
+          nodes: updatedNodes,
+          edges: updatedEdges
+        }
+      }));
+      ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
+    };
+
+    const deleteEdge = (edgeID) => {
+      const updatedEdges = edges.filter(edge => edge.id !== edgeID);
+      setEdges(updatedEdges);
+      setState(prevState => ({
+        ...prevState,
+        graph: {
+          ...prevState.graph,
+          edges: updatedEdges
+        }
+      }));
+      ToastQueue.positive('Edge deleted successfully.', {timeout: 1500});
+    };
 
     const editEdge = (targetID, label) => {
         const currentEdge = edges.find(x => x.id === rightClickedEdge)
@@ -499,6 +535,41 @@ export const AppWrapper = ({children}) => {
 
     function closeLinkDialog() {
       setLinkDialog(false);
+      console.log("link dialog closed.")
+    }
+
+    const [propertiesDialog, setPropertiesDialog] = useState(false);
+
+    function closePropertiesDialog(){
+      setPropertiesDialog(false);
+      console.log("properties dialog closed.")
+    }
+
+    const updateColor = (node, color) =>{
+      node.color = color;
+      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color}
+      console.log(state.graph.nodes);
+      return newNode
+    }
+
+    const updateShape = (node, shape) => {
+      node.shape = shape;
+      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color};
+      return newNode
+    }
+
+    const updateColorAndShape = (color, shape) => {
+      const arrayCopy = [...nodes]; //creating a copy
+      let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
+      let overwriteNode = arrayCopy[nodeIndex];
+      overwriteNode = updateColor(overwriteNode, color)
+      if (shape === null){
+        shape = overwriteNode.shape
+      }
+      overwriteNode = updateShape(overwriteNode, shape)
+      const newNode = {id: overwriteNode.id, label: overwriteNode.label, shape: overwriteNode.shape, color: overwriteNode.color}
+      arrayCopy[nodeIndex] = newNode
+      setNodes(arrayCopy);
     }
 
     const [editLinkDialog, setEditLinkDialog] = useState(false);
@@ -509,10 +580,11 @@ export const AppWrapper = ({children}) => {
 
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
-                                      orgDialog, rightClickedNode, rightClickedEdge, 
+                                      orgDialog, rightClickedNode, rightClickedEdge, propertiesDialog, 
                                       linkDialog, editLinkDialog, selectedNodeType, addPerson, editPerson, addOrganization, 
                                       editOrganization, addEdge, editEdge, closePersonDialog, closeEditNodeDialog, 
                                       closeOrgDialog, resetRightClickedNode, resetRightClickedEdge,
+                                      closePropertiesDialog, updateColorAndShape, deleteNode, deleteEdge,
                                       closeLinkDialog, closeEditLinkDialog}}>
             {children}
             <div className='container'
@@ -533,7 +605,7 @@ export const AppWrapper = ({children}) => {
                 buttons={[
                   {
                     text: "Add Link",
-                    icon: "",
+                    icon: "➕",
                     onClick: () => {setLinkDialog(true); resetNodeContextMenu()},
                   },
                   {
@@ -542,9 +614,14 @@ export const AppWrapper = ({children}) => {
                     onClick: () => {setEditNodeDialog(true); resetNodeContextMenu()},
                   },
                   {
-                    text: "Delete",
+                    text: "Properties",
+                    icon:"",
+                    onClick: () => {setPropertiesDialog(true); resetNodeContextMenu()},
+                  },
+                  {
+                    text: "Delete Node",
                     icon: "",
-                    onClick: () => alert("Unimplemented method"),
+                    onClick: () => {deleteNode(rightClickedNode); resetNodeContextMenu()},
                   }
                 ]}
               />
@@ -560,9 +637,9 @@ export const AppWrapper = ({children}) => {
                     onClick: () => {setEditLinkDialog(true); resetEdgeContextMenu()},
                   },
                   {
-                    text: "Delete",
+                    text: "Delete Edge",
                     icon: "",
-                    onClick: () => alert("Unimplemented method"),
+                    onClick: () => {deleteEdge(rightClickedEdge); resetEdgeContextMenu()},
                   }
                 ]}
               />
