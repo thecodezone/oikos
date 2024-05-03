@@ -125,7 +125,7 @@ export const AppWrapper = ({children}) => {
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
         setNodes(arrayCopy);
-        updateNodeState(personEntry)
+        //updateNodeState(personEntry)
       }
       else
       {
@@ -142,7 +142,7 @@ export const AppWrapper = ({children}) => {
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(orgEntry);
         setNodes(arrayCopy);
-        updateNodeState(orgEntry);
+        //updateNodeState(orgEntry);
       }
       else
       {
@@ -194,6 +194,21 @@ export const AppWrapper = ({children}) => {
           }
       });
       ToastQueue.positive(node.label + ' successfully added to map', {timeout:1500});
+    };
+
+    const updateNodeInfoState = () => {
+      state.graph.nodes[0].color = 'red';
+      setState(({ graph: { nodes, edges }, ...rest }) => {
+        return {
+          graph: {
+            nodes: state.graph.nodes,
+            edges: [
+              ...edges
+            ]
+          },
+          ...rest
+        }
+    });
     };
 
     const addEdge = (sourceID, targetID, label) => {
@@ -352,6 +367,66 @@ export const AppWrapper = ({children}) => {
         document.removeEventListener('click', handler)
       }
     })
+    
+    useEffect(() => {
+      setState({
+        graph: {nodes: nodes, edges: edges},
+        events: {
+          select: ({ nodes, edges }) => {
+            //console.log("Selected nodes:");
+            //console.log(nodes);
+            //console.log("Selected edges:");
+            //console.log(edges);
+            //alert("Selected node: " + nodes);
+          },
+          doubleClick: ({ pointer: { canvas } }) => {
+            //AlertDialog();
+          },
+          oncontext: (event) => {
+            // redraw needed for event pointer to work (unexplained as to why)
+            state.network.redraw();
+            let nodeID = state.network.getNodeAt(event.pointer.DOM);
+            let edgeID = state.network.getEdgeAt( event.pointer.DOM );
+            const contextMenuAttr = contextMenuRef.current.getBoundingClientRect()
+            const isLeft = event.pointer.DOM.x < window?.innerWidth / 2
+            let xPos = event.pointer.DOM.x
+            let yPos = event.pointer.DOM.y
+
+            if (!isLeft) {
+              xPos = xPos - contextMenuAttr.width
+            }
+
+            setPoints({
+              x: xPos,
+              y: yPos,
+            })
+            if (nodeID !== undefined) {
+              console.log(`node selected: ${nodeID}`);
+              setRightClickedNode(nodeID)
+              resetEdgeContextMenu()
+              resetCanvasContextMenu()
+              handleNodeOnContextMenu(event)
+            }
+            else if (edgeID !== undefined)
+            {
+              console.log(`edge selected: ${edgeID}`);
+              resetNodeContextMenu()
+              resetCanvasContextMenu()
+              handleEdgeOnContextMenu(event)
+            }
+            else
+            {
+              console.log(`canvas background selected`)
+              resetNodeContextMenu()
+              resetEdgeContextMenu()
+              handleCanvasOnContextMenu(event)
+            }
+          }
+        },
+        network: state.network
+      })
+  
+  }, [nodes,edges]);
 
     const [personDialog, setPersonDialog] = useState(false);
 
@@ -369,13 +444,48 @@ export const AppWrapper = ({children}) => {
 
     function closeLinkDialog() {
       setLinkDialog(false);
+      console.log("link dialog closed.")
+    }
+
+    const [propertiesDialog, setPropertiesDialog] = useState(false);
+
+    function closePropertiesDialog(){
+      setPropertiesDialog(false);
+      console.log("properties dialog closed.")
+    }
+
+    const updateColor = (node, color) =>{
+      node.color = color;
+      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color}
+      console.log(state.graph.nodes);
+      return newNode
+    }
+
+    const updateShape = (node, shape) => {
+      node.shape = shape;
+      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color};
+      return newNode
+    }
+
+    const updateColorAndShape = (color, shape) => {
+      const arrayCopy = [...nodes]; //creating a copy
+      let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
+      let overwriteNode = arrayCopy[nodeIndex];
+      overwriteNode = updateColor(overwriteNode, color)
+      if (shape === null){
+        shape = overwriteNode.shape
+      }
+      overwriteNode = updateShape(overwriteNode, shape)
+      const newNode = {id: overwriteNode.id, label: overwriteNode.label, shape: overwriteNode.shape, color: overwriteNode.color}
+      arrayCopy[nodeIndex] = newNode
+      setNodes(arrayCopy);
     }
 
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, 
-                                      orgDialog, rightClickedNode, rightClickedEdge, linkDialog, addPerson, addOrganization, 
+                                      orgDialog, rightClickedNode, rightClickedEdge, linkDialog, propertiesDialog, addPerson, addOrganization, 
                                       addEdge, closePersonDialog, closeOrgDialog, resetRightClickedNode, resetRightClickedEdge,
-                                      closeLinkDialog, deleteNode, deleteEdge}}>
+                                      closeLinkDialog, closePropertiesDialog, updateColorAndShape, deleteNode, deleteEdge}}>
             {children}
             <div className='container'
             onContextMenu={(e) => {
@@ -397,6 +507,11 @@ export const AppWrapper = ({children}) => {
                     text: "Add Link",
                     icon: "➕",
                     onClick: () => {setLinkDialog(true); resetNodeContextMenu()},
+                  },
+                  {
+                    text: "Properties",
+                    icon:"",
+                    onClick: () => {setPropertiesDialog(true); resetNodeContextMenu()},
                   },
                   {
                     text: "Delete Node",
