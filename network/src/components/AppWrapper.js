@@ -7,6 +7,7 @@ import { options } from './options';
 import NodeContextMenu from "./contextMenus/NodeContextMenu";
 import EdgeContextMenu from "./contextMenus/EdgeContextMenu";
 import CanvasContextMenu from "./contextMenus/CanvasContextMenu";
+import { v4 as uuidv4 } from 'uuid'
 
 const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
@@ -26,19 +27,20 @@ export const AppWrapper = ({children}) => {
         {id: 10, label: "Joya", shape: "box"}
     ])
     const [edges, setEdges] = useState([
-        {from: 1, to: 2, label: "Uncle"},
-        {from: 2, to: 3, label: "Wife"},
-        {from: 1, to: 4, label: "Mother"},
-        {from: 1, to: 5, label: "Friend"},
-        {from: 1, to: 6, label: "Friend"},
-        {from: 1, to: 7, label: "Friend"},
-        {from: 3, to: 8, label: "Child"},
-        {from: 3, to: 9, label: "Child"},
-        {from: 4, to: 10, label: "Friend"}
+        {id: 1, from: 1, to: 2, label: "Uncle"},
+        {id: 2, from: 2, to: 3, label: "Wife"},
+        {id: 3, from: 1, to: 4, label: "Mother"},
+        {id: 4, from: 1, to: 5, label: "Friend"},
+        {id: 5, from: 1, to: 6, label: "Friend"},
+        {id: 6, from: 1, to: 7, label: "Friend"},
+        {id: 7, from: 3, to: 8, label: "Child"},
+        {id: 8, from: 3, to: 9, label: "Child"},
+        {id: 9, from: 4, to: 10, label: "Friend"}
     ])
 
     const [rightClickedNode, setRightClickedNode] = useState(null);
     const [rightClickedEdge, setRightClickedEdge] = useState(null);
+    const [selectedNodeType, setSelectedNodeType] = useState(null);
 
     function resetRightClickedNode() {
       setRightClickedNode(null);
@@ -46,6 +48,10 @@ export const AppWrapper = ({children}) => {
   
     function resetRightClickedEdge() {
       setRightClickedEdge(null);
+    }
+
+    function resetRightClickedEdge() {
+        setRightClickedEdge(null);
     }
 
     let [state, setState] = useState({
@@ -82,13 +88,25 @@ export const AppWrapper = ({children}) => {
             if (nodeID !== undefined) {
               console.log(`node selected: ${nodeID}`);
               setRightClickedNode(nodeID)
+              const currentNodeType = nodes.find(x => x.id === nodeID).nodeInfo
+              if (currentNodeType !== undefined)
+              {
+                if (currentNodeType instanceof Person) 
+                {
+                  setSelectedNodeType('person')
+                }
+                else
+                {
+                  setSelectedNodeType('organization')
+                }
+              }
+              console.log(selectedNodeType)
               resetRightClickedEdge()
               resetEdgeContextMenu()
               resetCanvasContextMenu()
               handleNodeOnContextMenu(event)
             }
-            else if (edgeID !== undefined)
-            {
+            else if (edgeID !== undefined) {
               console.log(`edge selected: ${edgeID}`);
               setRightClickedEdge(edgeID)
               resetRightClickedNode()
@@ -96,8 +114,7 @@ export const AppWrapper = ({children}) => {
               resetCanvasContextMenu()
               handleEdgeOnContextMenu(event)
             }
-            else
-            {
+            else {
               console.log(`canvas background selected`)
               resetRightClickedNode()
               resetRightClickedEdge()
@@ -121,11 +138,10 @@ export const AppWrapper = ({children}) => {
             nodeShape = "circle"
         }
         const newPerson = new Person(name, phone, status, request, reminder)
-        const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape};
+        const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
         setNodes(arrayCopy);
-        //updateNodeState(personEntry)
       }
       else
       {
@@ -133,22 +149,81 @@ export const AppWrapper = ({children}) => {
       }
     };
 
+    const editPerson = (name, phone, status, request, reminder) => {
+        if (name !== '' && status !== '')
+        {
+          const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo
+          if (currentPerson.getName() !== name)
+          {
+            name = adjustDuplicateName(name);
+          }
+          let nodeShape = "box"
+          if (status === 'believer')
+          {
+              nodeShape = "circle"
+          }
+          currentPerson.setName(name)
+          currentPerson.setPhone(phone)
+          currentPerson.setStatus(status)
+          currentPerson.setRequest(request)
+          currentPerson.setReminder(reminder)
+          console.log(currentPerson.getName())
+          const personEntry = {id: currentPerson.getID(), label: currentPerson.getName(), shape: nodeShape, nodeInfo: currentPerson};
+          const arrayCopy = [...nodes]; //creating a copy
+          let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
+          arrayCopy[nodeIndex] = personEntry
+          setNodes(arrayCopy);
+          console.log(nodes)
+        }
+        else
+        {
+          ToastQueue.negative('Missing required fields.', {timeout:1500});
+        }
+      };
+
     const addOrganization = (name, description, website, request, reminder) => {
       if (name !== '')
       {
         name = adjustDuplicateName(name);
         const newOrg = new Organization(name, description, website, request, reminder)
-        const orgEntry = {id: newOrg.getID(), label: name, shape: "box"};
+        const orgEntry = {id: newOrg.getID(), label: name, shape: "box", nodeInfo: newOrg};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(orgEntry);
         setNodes(arrayCopy);
-        //updateNodeState(orgEntry);
       }
       else
       {
         ToastQueue.negative('Missing required fields.', {timeout:1500});
       }
     }
+
+    const editOrganization = (name, description, website, request, reminder) => {
+        if (name !== '')
+        {
+          const currentNode = nodes.find(x => x.id === rightClickedNode)
+          const currentOrganization = currentNode.nodeInfo
+          if (currentOrganization.getName() !== name)
+          {
+            name = adjustDuplicateName(name);
+          }
+          currentOrganization.setName(name)
+          currentOrganization.setDescription(description)
+          currentOrganization.setWebsite(website)
+          currentOrganization.setRequest(request)
+          currentOrganization.setReminder(reminder)
+          console.log(currentOrganization.getName())
+          const orgEntry = {id: currentOrganization.getID(), label: currentOrganization.getName(), shape: currentNode.shape, nodeInfo: currentOrganization};
+          const arrayCopy = [...nodes]; //creating a copy
+          let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
+          arrayCopy[nodeIndex] = orgEntry
+          setNodes(arrayCopy);
+          console.log(nodes)
+        }
+        else
+        {
+          ToastQueue.negative('Missing required fields.', {timeout:1500});
+        }
+      }
 
     const adjustDuplicateName = (name) => {
       let duplicateExists = false;
@@ -177,40 +252,81 @@ export const AppWrapper = ({children}) => {
       }
     }
 
-    const updateNodeState = (node) => {
-      // updates the nodes in the state with the new node
-      setState(({ graph: { nodes, edges }, ...rest }) => {
-          return {
-            graph: {
-              nodes: [
-                ...nodes,
-                node
-              ],
-              edges: [
-                ...edges
-              ]
+      useEffect(() => {
+        setState({
+          graph: {nodes: nodes, edges: edges},
+          events: {
+            select: ({ nodes, edges }) => {
+              //console.log("Selected nodes:");
+              //console.log(nodes);
+              //console.log("Selected edges:");
+              //console.log(edges);
+              //alert("Selected node: " + nodes);
             },
-            ...rest
-          }
-      });
-      ToastQueue.positive(node.label + ' successfully added to map', {timeout:1500});
-    };
-
-    const updateNodeInfoState = () => {
-      state.graph.nodes[0].color = 'red';
-      setState(({ graph: { nodes, edges }, ...rest }) => {
-        return {
-          graph: {
-            nodes: state.graph.nodes,
-            edges: [
-              ...edges
-            ]
+            doubleClick: ({ pointer: { canvas } }) => {
+              //AlertDialog();
+            },
+            oncontext: (event) => {
+              // redraw needed for event pointer to work (unexplained as to why)
+              state.network.redraw();
+              let nodeID = state.network.getNodeAt(event.pointer.DOM);
+              let edgeID = state.network.getEdgeAt( event.pointer.DOM );
+              const contextMenuAttr = contextMenuRef.current.getBoundingClientRect()
+              const isLeft = event.pointer.DOM.x < window?.innerWidth / 2
+              let xPos = event.pointer.DOM.x
+              let yPos = event.pointer.DOM.y
+  
+              if (!isLeft) {
+                xPos = xPos - contextMenuAttr.width
+              }
+  
+              setPoints({
+                x: xPos,
+                y: yPos,
+              })
+              if (nodeID !== undefined) {
+                console.log(`node selected: ${nodeID}`);
+                setRightClickedNode(nodeID)
+                const currentNodeType = nodes.find(x => x.id === nodeID).nodeInfo
+                console.log(nodes.find(x => x.id === nodeID))
+                if (currentNodeType !== undefined)
+                {
+                  if (currentNodeType instanceof Person) 
+                  {
+                    setSelectedNodeType('person')
+                  }
+                  else
+                  {
+                    setSelectedNodeType('organization')
+                  }
+                }
+                console.log(selectedNodeType)
+                resetEdgeContextMenu()
+                resetCanvasContextMenu()
+                handleNodeOnContextMenu(event)
+              }
+              else if (edgeID !== undefined)
+              {
+                console.log(`edge selected: ${edgeID}`);
+                setRightClickedEdge(edgeID)
+                resetNodeContextMenu()
+                resetCanvasContextMenu()
+                handleEdgeOnContextMenu(event)
+              }
+              else
+              {
+                console.log(`canvas background selected`)
+                resetNodeContextMenu()
+                resetEdgeContextMenu()
+                handleCanvasOnContextMenu(event)
+              }
+            }
           },
-          ...rest
-        }
-    });
-    };
-
+          network: state.network
+        })
+    
+    }, [nodes,edges]);
+  
     const addEdge = (sourceID, targetID, label) => {
         if (sourceID !== null && targetID !== null && label !== '')
         {
@@ -224,7 +340,7 @@ export const AppWrapper = ({children}) => {
                 }
             }
             // updates the edges array
-            const newEdge = {from: sourceID, to: targetID, label: label};
+            const newEdge = {id: uuidv4(), from: sourceID, to: targetID, label: label};
             const arrayCopy = [...edges];
             arrayCopy.push(newEdge);
             setEdges(arrayCopy);
@@ -278,6 +394,35 @@ export const AppWrapper = ({children}) => {
       }));
       ToastQueue.positive('Edge deleted successfully.', {timeout: 1500});
     };
+
+    const editEdge = (targetID, label) => {
+        const currentEdge = edges.find(x => x.id === rightClickedEdge)
+        if (targetID !== null && label !== '')
+        {
+            for (let i = 0; i<edges.length; i++)
+            {
+                if (edges[i].from === currentEdge.from && edges[i].to === targetID)
+                {
+                    const source = nodes.find(x => x.id === currentEdge.from)
+                    ToastQueue.info('Edge from ' + source.label + 
+                    ' to ' + nodes.find(x => x.id === targetID).label + ' already exists.', {timeout:1500})
+                    return;
+                }
+            }
+            // updates the edges array
+            const sameEdge = {id: currentEdge.id, from: currentEdge.from, to: targetID, label: label};
+            const arrayCopy = [...edges];
+            let edgeIndex = nodes.findIndex(obj => obj.id === rightClickedEdge)
+            arrayCopy[edgeIndex] = sameEdge
+            setEdges(arrayCopy);
+            console.log(edges)
+            ToastQueue.positive('Successfully added link.', {timeout:1500});
+        }
+        else
+        {
+            ToastQueue.negative('Missing required fields.', {timeout:1500});
+        }
+    }
 
     const setNetworkInstance = nw => {
       state.network = nw;
@@ -367,71 +512,17 @@ export const AppWrapper = ({children}) => {
         document.removeEventListener('click', handler)
       }
     })
-    
-    useEffect(() => {
-      setState({
-        graph: {nodes: nodes, edges: edges},
-        events: {
-          select: ({ nodes, edges }) => {
-            //console.log("Selected nodes:");
-            //console.log(nodes);
-            //console.log("Selected edges:");
-            //console.log(edges);
-            //alert("Selected node: " + nodes);
-          },
-          doubleClick: ({ pointer: { canvas } }) => {
-            //AlertDialog();
-          },
-          oncontext: (event) => {
-            // redraw needed for event pointer to work (unexplained as to why)
-            state.network.redraw();
-            let nodeID = state.network.getNodeAt(event.pointer.DOM);
-            let edgeID = state.network.getEdgeAt( event.pointer.DOM );
-            const contextMenuAttr = contextMenuRef.current.getBoundingClientRect()
-            const isLeft = event.pointer.DOM.x < window?.innerWidth / 2
-            let xPos = event.pointer.DOM.x
-            let yPos = event.pointer.DOM.y
-
-            if (!isLeft) {
-              xPos = xPos - contextMenuAttr.width
-            }
-
-            setPoints({
-              x: xPos,
-              y: yPos,
-            })
-            if (nodeID !== undefined) {
-              console.log(`node selected: ${nodeID}`);
-              setRightClickedNode(nodeID)
-              resetEdgeContextMenu()
-              resetCanvasContextMenu()
-              handleNodeOnContextMenu(event)
-            }
-            else if (edgeID !== undefined)
-            {
-              console.log(`edge selected: ${edgeID}`);
-              resetNodeContextMenu()
-              resetCanvasContextMenu()
-              handleEdgeOnContextMenu(event)
-            }
-            else
-            {
-              console.log(`canvas background selected`)
-              resetNodeContextMenu()
-              resetEdgeContextMenu()
-              handleCanvasOnContextMenu(event)
-            }
-          }
-        },
-        network: state.network
-      })
-  
-  }, [nodes,edges]);
 
     const [personDialog, setPersonDialog] = useState(false);
 
     function closePersonDialog() {
       setPersonDialog(false);
+    }
+
+    const [editNodeDialog, setEditNodeDialog] = useState(false);
+
+    function closeEditNodeDialog() {
+      setEditNodeDialog(false);
     }
 
     const [orgDialog, setOrgDialog] = useState(false);
@@ -481,11 +572,20 @@ export const AppWrapper = ({children}) => {
       setNodes(arrayCopy);
     }
 
+    const [editLinkDialog, setEditLinkDialog] = useState(false);
+
+    function closeEditLinkDialog() {
+      setEditLinkDialog(false);
+    }
+
     return (
-        <AppContext.Provider value = {{state, nodes, edges, personDialog, 
-                                      orgDialog, rightClickedNode, rightClickedEdge, linkDialog, propertiesDialog, addPerson, addOrganization, 
-                                      addEdge, closePersonDialog, closeOrgDialog, resetRightClickedNode, resetRightClickedEdge,
-                                      closeLinkDialog, closePropertiesDialog, updateColorAndShape, deleteNode, deleteEdge}}>
+        <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
+                                      orgDialog, rightClickedNode, rightClickedEdge, propertiesDialog, 
+                                      linkDialog, editLinkDialog, selectedNodeType, addPerson, editPerson, addOrganization, 
+                                      editOrganization, addEdge, editEdge, closePersonDialog, closeEditNodeDialog, 
+                                      closeOrgDialog, resetRightClickedNode, resetRightClickedEdge,
+                                      closePropertiesDialog, updateColorAndShape, deleteNode, deleteEdge,
+                                      closeLinkDialog, closeEditLinkDialog}}>
             {children}
             <div className='container'
             onContextMenu={(e) => {
@@ -509,6 +609,11 @@ export const AppWrapper = ({children}) => {
                     onClick: () => {setLinkDialog(true); resetNodeContextMenu()},
                   },
                   {
+                    text: "Edit Info",
+                    icon: "",
+                    onClick: () => {setEditNodeDialog(true); resetNodeContextMenu()},
+                  },
+                  {
                     text: "Properties",
                     icon:"",
                     onClick: () => {setPropertiesDialog(true); resetNodeContextMenu()},
@@ -527,19 +632,14 @@ export const AppWrapper = ({children}) => {
                 positionY={points.y}
                 buttons={[
                   {
+                    text: "Edit",
+                    icon: "",
+                    onClick: () => {setEditLinkDialog(true); resetEdgeContextMenu()},
+                  },
+                  {
                     text: "Delete Edge",
                     icon: "",
                     onClick: () => {deleteEdge(rightClickedEdge); resetEdgeContextMenu()},
-                  },
-                  {
-                    text: "edge button 2",
-                    icon: "",
-                    onClick: () => alert("wow"),
-                  },
-                  {
-                    text: "edge button 3",
-                    icon: "",
-                    onClick: () => alert("goodbye"),
                   }
                 ]}
               />
@@ -558,7 +658,7 @@ export const AppWrapper = ({children}) => {
                     text: "Add an Organization",
                     icon: "",
                     onClick: () => {setOrgDialog(true); resetCanvasContextMenu()},
-                  }
+                  },
                 ]}
               />
             </div>
