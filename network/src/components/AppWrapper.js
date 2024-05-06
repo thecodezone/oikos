@@ -13,29 +13,40 @@ const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
 
 export const AppWrapper = ({children}) => {
+  // hardcoded fillers for the example nodes
+  const jayden = new Person('Jayden')
+  const ryan = new Person('Ryan')
+  const amanda = new Person('Amanda')
+  const steffanie = new Person('Steffanie')
+  const aaron = new Person('Aaron')
+  const malachi = new Person('Malachi')
+  const zach = new Person('Zach')
+  const aven = new Person('Aven')
+  const bitty = new Person('Bitty')
+  const joya = new Person('Joya')
   // nodes, edges, and state
     const [nodes, setNodes] = useState([
-        {id: 1, label: "Jayden", shape: "circle"},
-        {id: 2, label: "Ryan", shape: "box"},
-        {id: 3, label: "Amanda", shape: "box"},
-        {id: 4, label: "Steffanie", shape: "circle"},
-        {id: 5, label: "Aaron", shape: "circle"},
-        {id: 6, label: "Malachi", shape: "circle"},
-        {id: 7, label: "Zach", shape: "circle"},
-        {id: 8, label: "Aven", shape: "box"},
-        {id: 9, label: "Bitty", shape: "box"},
-        {id: 10, label: "Joya", shape: "box"}
+        {id: jayden.getID(), label: "Jayden", shape: "circle", nodeInfo: jayden},
+        {id: ryan.getID(), label: "Ryan", shape: "box", nodeInfo: ryan},
+        {id: amanda.getID(), label: "Amanda", shape: "box", nodeInfo: amanda},
+        {id: steffanie.getID(), label: "Steffanie", shape: "circle", nodeInfo: steffanie},
+        {id: aaron.getID(), label: "Aaron", shape: "circle", nodeInfo: aaron},
+        {id: malachi.getID(), label: "Malachi", shape: "circle", nodeInfo: malachi},
+        {id: zach.getID(), label: "Zach", shape: "circle", nodeInfo: zach},
+        {id: aven.getID(), label: "Aven", shape: "box", nodeInfo: aven},
+        {id: bitty.getID(), label: "Bitty", shape: "box", nodeInfo: bitty},
+        {id: joya.getID(), label: "Joya", shape: "box", nodeInfo: joya}
     ])
     const [edges, setEdges] = useState([
-        {id: 1, from: 1, to: 2, label: "Uncle"},
-        {id: 2, from: 2, to: 3, label: "Wife"},
-        {id: 3, from: 1, to: 4, label: "Mother"},
-        {id: 4, from: 1, to: 5, label: "Friend"},
-        {id: 5, from: 1, to: 6, label: "Friend"},
-        {id: 6, from: 1, to: 7, label: "Friend"},
-        {id: 7, from: 3, to: 8, label: "Child"},
-        {id: 8, from: 3, to: 9, label: "Child"},
-        {id: 9, from: 4, to: 10, label: "Friend"}
+        {id: 1, from: jayden.getID(), to: ryan.getID(), label: "Uncle"},
+        {id: 2, from: ryan.getID(), to: amanda.getID(), label: "Wife"},
+        {id: 3, from: jayden.getID(), to: steffanie.getID(), label: "Mother"},
+        {id: 4, from: jayden.getID(), to: aaron.getID(), label: "Friend"},
+        {id: 5, from: jayden.getID(), to: malachi.getID(), label: "Friend"},
+        {id: 6, from: jayden.getID(), to: zach.getID(), label: "Friend"},
+        {id: 7, from: amanda.getID(), to: aven.getID(), label: "Child"},
+        {id: 8, from: amanda.getID(), to: bitty.getID(), label: "Child"},
+        {id: 9, from: steffanie.getID(), to: joya.getID(), label: "Friend"}
     ])
 
     const [rightClickedNode, setRightClickedNode] = useState(null);
@@ -344,21 +355,6 @@ export const AppWrapper = ({children}) => {
             const arrayCopy = [...edges];
             arrayCopy.push(newEdge);
             setEdges(arrayCopy);
-            // updates the edges in the state with the new edge
-            setState(({ graph: { nodes, edges }, ...rest }) => {
-                return {
-                  graph: {
-                    nodes: [
-                      ...nodes
-                    ],
-                    edges: [
-                      ...edges,
-                      newEdge
-                    ]
-                  },
-                  ...rest
-                }
-            });
             ToastQueue.positive('Successfully added link.', {timeout:1500});
         }
         else
@@ -412,11 +408,11 @@ export const AppWrapper = ({children}) => {
             // updates the edges array
             const sameEdge = {id: currentEdge.id, from: currentEdge.from, to: targetID, label: label};
             const arrayCopy = [...edges];
-            let edgeIndex = nodes.findIndex(obj => obj.id === rightClickedEdge)
+            let edgeIndex = arrayCopy.findIndex(obj => obj.id === rightClickedEdge)
             arrayCopy[edgeIndex] = sameEdge
             setEdges(arrayCopy);
             console.log(edges)
-            ToastQueue.positive('Successfully added link.', {timeout:1500});
+            ToastQueue.positive('Successfully updated link.', {timeout:1500});
         }
         else
         {
@@ -547,14 +543,14 @@ export const AppWrapper = ({children}) => {
 
     const updateColor = (node, color) =>{
       node.color = color;
-      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color}
+      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color, nodeInfo: node.nodeInfo}
       console.log(state.graph.nodes);
       return newNode
     }
 
     const updateShape = (node, shape) => {
       node.shape = shape;
-      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color};
+      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color, nodeInfo: node.nodeInfo};
       return newNode
     }
 
@@ -567,7 +563,7 @@ export const AppWrapper = ({children}) => {
         shape = overwriteNode.shape
       }
       overwriteNode = updateShape(overwriteNode, shape)
-      const newNode = {id: overwriteNode.id, label: overwriteNode.label, shape: overwriteNode.shape, color: overwriteNode.color}
+      const newNode = {id: overwriteNode.id, label: overwriteNode.label, shape: overwriteNode.shape, color: overwriteNode.color, nodeInfo: overwriteNode.nodeInfo}
       arrayCopy[nodeIndex] = newNode
       setNodes(arrayCopy);
     }
