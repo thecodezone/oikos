@@ -1,0 +1,19 @@
+body{
+  background-color: black;
+}
+
+.container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.header{
+  color: white;
+  cursor: default;
+}
+
+.addPersonButton{
+  color: green;
+}
