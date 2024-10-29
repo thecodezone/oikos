@@ -6,7 +6,7 @@ import { Heading } from '@adobe/react-spectrum';
 import {ColorWheel} from '@react-spectrum/color'
 import {parseColor} from '@react-stately/color';
 import {ToastContainer} from '@react-spectrum/toast'
-import { AppData } from './components/AppWrapper';
+import { AppData } from '../components/AppWrapper';
 
 export default function CustomNodeForm() {
   const { propertiesDialog, closePropertiesDialog } = AppData();

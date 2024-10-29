@@ -4,7 +4,7 @@ import { Item, ComboBox } from '@adobe/react-spectrum';
 import { Form, ActionButton,  Content, Dialog, DialogTrigger } from '@adobe/react-spectrum';
 import { Heading } from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
-import { AppData } from './components/AppWrapper';
+import { AppData } from '../components/AppWrapper';
 
 export default function ViewListForm() {
   const { edges, nodes } = AppData();

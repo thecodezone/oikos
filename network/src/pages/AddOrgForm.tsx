@@ -3,7 +3,7 @@ import {Button, ButtonGroup, defaultTheme, TextField, Provider, Checkbox, TextAr
 import {Link, Form, Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
-import { AppData } from './components/AppWrapper';
+import { AppData } from '../components/AppWrapper';
 
 export default function OrgPrayerForm() {
   const { orgDialog, closeOrgDialog } = AppData();
