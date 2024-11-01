@@ -4,7 +4,7 @@ import { Item, ComboBox } from '@adobe/react-spectrum';
 import { Form,  Content, Dialog } from '@adobe/react-spectrum';
 import { Heading } from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
-import { AppData } from './components/AppWrapper';
+import { AppData } from '../components/AppWrapper';
 
 export default function AddLinkForm() {
   const { linkDialog, closeLinkDialog } = AppData();
