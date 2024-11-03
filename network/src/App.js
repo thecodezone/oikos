@@ -1,12 +1,12 @@
-import './App.css';
-import IndividualPrayerForm from './AddPersonForm.tsx';
-import OrgPrayerForm from './AddOrgForm.tsx';
-import { Header } from './Header';
-import AddLinkForm from './AddLinkForm.tsx';
-import ViewListForm from './listForm.tsx';
-import EditNodeForm from './EditNodeForm.tsx';
-import EditLinkForm from './EditLinkForm.tsx';
-import CustomNodeForm from './CustomNode.tsx';
+import './css/App.css';
+import IndividualPrayerForm from './pages/AddPersonForm.tsx';
+import OrgPrayerForm from './pages/AddOrgForm.tsx';
+import { Header } from './js/Header';
+import AddLinkForm from './pages/AddLinkForm.tsx';
+import ViewListForm from './pages/listForm.tsx';
+import EditNodeForm from './pages/EditNodeForm.tsx';
+import EditLinkForm from './pages/EditLinkForm.tsx';
+import CustomNodeForm from './pages/CustomNode.tsx';
 
 function App() {
   console.log("script started")

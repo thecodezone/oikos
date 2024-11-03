@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
-import { Person } from '../personModel'
-import { Organization } from '../orgModel'
+import { Person } from '../js/personModel'
+import { Organization } from '../js/orgModel'
 import {ToastQueue} from '@react-spectrum/toast'
 import Graph from 'react-vis-network-graph';
 import { options } from './options';

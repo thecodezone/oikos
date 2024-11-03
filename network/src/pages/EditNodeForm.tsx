@@ -5,7 +5,7 @@ import {Link, Form, Content, Dialog, DialogTrigger} from '@adobe/react-spectrum'
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
 import {FieldError} from 'react-aria-components';
-import { AppData } from './components/AppWrapper';
+import { AppData } from '../components/AppWrapper';
 
 export default function EditNodeForm() {
   const { editNodeDialog, closeEditNodeDialog, selectedNodeType } = AppData();
