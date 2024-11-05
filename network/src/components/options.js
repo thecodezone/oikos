@@ -3,7 +3,8 @@ export const options = {
         enabled: false
     },
     interaction: {
-        navigationButtons: true
+        navigationButtons: true,
+        zoomView: false
     },
     edges: {
         color: "yellow"
