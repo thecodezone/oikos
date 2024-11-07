@@ -49,6 +49,7 @@ export const AppWrapper = ({children}) => {
         {id: 9, from: steffanie.getID(), to: joya.getID(), label: "Friend"}
     ])
 
+    const [isCtrlPressed, setIsCtrlPressed] = useState(false);
     const [rightClickedNode, setRightClickedNode] = useState(null);
     const [rightClickedEdge, setRightClickedEdge] = useState(null);
     const [selectedNodeType, setSelectedNodeType] = useState(null);
@@ -574,6 +575,48 @@ export const AppWrapper = ({children}) => {
       setEditLinkDialog(false);
     }
 
+
+  // Default options for vis-network
+  const [dynamicOptions, setDynamicOptions] = useState(options);
+
+  
+
+  // Function to toggle zoom based on Ctrl key press
+  const handleKeyDown = (event) => {
+    if (event.key === 'Control' || event.key === 'Meta') {  // Meta is for Cmd on macOS
+      setIsCtrlPressed(true);
+    }
+  };
+
+  const handleKeyUp = (event) => {
+    if (event.key === 'Control' || event.key === 'Meta') {
+      setIsCtrlPressed(false);
+    }
+  };
+
+  // Update the dynamic options based on Ctrl press state
+  useEffect(() => {
+    setDynamicOptions((prevOptions) => ({
+      ...prevOptions,
+      interaction: {
+        ...prevOptions.interaction,
+        zoomView: isCtrlPressed,  // Enable zoom when Ctrl is pressed
+      },
+    }));
+  }, [isCtrlPressed]);
+
+  // Set up event listeners for key press events
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
                                       orgDialog, rightClickedNode, rightClickedEdge, propertiesDialog, 
@@ -613,7 +656,7 @@ export const AppWrapper = ({children}) => {
             </div>
               <Graph
                   graph = {state.graph}
-                  options = {options}
+                  options = {dynamicOptions}
                   events = {state.events}
                   getNetwork={setNetworkInstance}
               />
