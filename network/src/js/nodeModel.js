@@ -32,4 +32,10 @@ export class nodeModel {
     setReminder(reminder) {
         this.reminder = reminder;
     }
+    getCustomFields() {
+        return this.customFields;
+    }
+    setCustomFields(customFields) {
+        this.customFields = customFields;
+    }
 }
