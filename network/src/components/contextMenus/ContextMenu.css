@@ -70,6 +70,23 @@
     color: darkred;
 }
 
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;  /* Space between the buttons and the graph */
+}
+  
+.button-container button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
+.button-container button:hover {
+    background-color: #0056b3;
+}
+
 .container {
     position: relative; 
     width: 100%;
