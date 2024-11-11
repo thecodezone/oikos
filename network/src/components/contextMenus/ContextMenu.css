@@ -52,6 +52,24 @@
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
 }
 
+.delete-x {
+    margin-top: 23px;
+    margin-left: 8px;
+    padding: 0;
+    opacity: 1;
+    color: red;
+    font-size: 20px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.delete-x:hover {
+    color: darkred;
+}
+
 .button-container {
     display: flex;
     justify-content: center;
@@ -68,6 +86,7 @@
 .button-container button:hover {
     background-color: #0056b3;
 }
+
 .container {
     position: relative; 
     width: 100%;
@@ -81,5 +100,3 @@
     position: relative;
     z-index: 1; 
   }
-
-  

@@ -161,37 +161,51 @@ export const AppWrapper = ({children}) => {
       }
     };
 
-    const editPerson = (name, phone, status, request, reminder) => {
-        if (name !== '' && status !== '')
-        {
-          const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo
-          if (currentPerson.getName() !== name)
-          {
-            name = adjustDuplicateName(name);
+    const editPerson = (name, phone, status, request, reminder, customFields) => {
+      if (name !== '' && status !== '') {
+          const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo;
+  
+          if (currentPerson.getName() !== name) {
+              name = adjustDuplicateName(name);
           }
-          let nodeShape = "box"
-          if (status === 'believer')
-          {
-              nodeShape = "circle"
+  
+          let nodeShape = "box";
+          if (status === 'believer') {
+              nodeShape = "circle";
           }
-          currentPerson.setName(name)
-          currentPerson.setPhone(phone)
-          currentPerson.setStatus(status)
-          currentPerson.setRequest(request)
-          currentPerson.setReminder(reminder)
-          console.log(currentPerson.getName())
-          const personEntry = {id: currentPerson.getID(), label: currentPerson.getName(), shape: nodeShape, nodeInfo: currentPerson};
-          const arrayCopy = [...nodes]; //creating a copy
-          let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
-          arrayCopy[nodeIndex] = personEntry
-          setNodes(arrayCopy);
-          console.log(nodes)
-        }
-        else
-        {
-          ToastQueue.negative('Missing required fields.', {timeout:1500});
-        }
-      };
+  
+          // Update person info
+          currentPerson.setName(name);
+          currentPerson.setPhone(phone);
+          currentPerson.setStatus(status);
+          currentPerson.setRequest(request);
+          currentPerson.setReminder(reminder);
+  
+          // Save custom fields
+          currentPerson.setCustomFields(customFields); // Save the custom fields
+  
+          console.log(currentPerson.getName());
+  
+          const personEntry = {
+              id: currentPerson.getID(),
+              label: currentPerson.getName(),
+              shape: nodeShape,
+              nodeInfo: currentPerson
+          };
+  
+          // Update nodes array
+          const arrayCopy = [...nodes]; // creating a copy
+          let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode);
+          arrayCopy[nodeIndex] = personEntry;
+  
+          setNodes(arrayCopy); // Update state with the modified node
+          console.log(nodes);
+      } else {
+          ToastQueue.negative('Missing required fields.', { timeout: 1500 });
+      }
+  };
+  
+  
 
     const addOrganization = (name, description, website, request, reminder) => {
       if (name !== '')
