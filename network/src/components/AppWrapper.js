@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
-import { Person } from '../personModel'
-import { Organization } from '../orgModel'
+import { Person } from '../js/personModel'
+import { Organization } from '../js/orgModel'
 import {ToastQueue} from '@react-spectrum/toast'
 import Graph from 'react-vis-network-graph';
 import { options } from './options';
@@ -49,6 +49,7 @@ export const AppWrapper = ({children}) => {
         {id: 9, from: steffanie.getID(), to: joya.getID(), label: "Friend"}
     ])
 
+    const [isCtrlPressed, setIsCtrlPressed] = useState(false);
     const [rightClickedNode, setRightClickedNode] = useState(null);
     const [rightClickedEdge, setRightClickedEdge] = useState(null);
     const [selectedNodeType, setSelectedNodeType] = useState(null);
@@ -160,37 +161,51 @@ export const AppWrapper = ({children}) => {
       }
     };
 
-    const editPerson = (name, phone, status, request, reminder) => {
-        if (name !== '' && status !== '')
-        {
-          const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo
-          if (currentPerson.getName() !== name)
-          {
-            name = adjustDuplicateName(name);
+    const editPerson = (name, phone, status, request, reminder, customFields) => {
+      if (name !== '' && status !== '') {
+          const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo;
+  
+          if (currentPerson.getName() !== name) {
+              name = adjustDuplicateName(name);
           }
-          let nodeShape = "box"
-          if (status === 'believer')
-          {
-              nodeShape = "circle"
+  
+          let nodeShape = "box";
+          if (status === 'believer') {
+              nodeShape = "circle";
           }
-          currentPerson.setName(name)
-          currentPerson.setPhone(phone)
-          currentPerson.setStatus(status)
-          currentPerson.setRequest(request)
-          currentPerson.setReminder(reminder)
-          console.log(currentPerson.getName())
-          const personEntry = {id: currentPerson.getID(), label: currentPerson.getName(), shape: nodeShape, nodeInfo: currentPerson};
-          const arrayCopy = [...nodes]; //creating a copy
-          let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode)
-          arrayCopy[nodeIndex] = personEntry
-          setNodes(arrayCopy);
-          console.log(nodes)
-        }
-        else
-        {
-          ToastQueue.negative('Missing required fields.', {timeout:1500});
-        }
-      };
+  
+          // Update person info
+          currentPerson.setName(name);
+          currentPerson.setPhone(phone);
+          currentPerson.setStatus(status);
+          currentPerson.setRequest(request);
+          currentPerson.setReminder(reminder);
+  
+          // Save custom fields
+          currentPerson.setCustomFields(customFields); // Save the custom fields
+  
+          console.log(currentPerson.getName());
+  
+          const personEntry = {
+              id: currentPerson.getID(),
+              label: currentPerson.getName(),
+              shape: nodeShape,
+              nodeInfo: currentPerson
+          };
+  
+          // Update nodes array
+          const arrayCopy = [...nodes]; // creating a copy
+          let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode);
+          arrayCopy[nodeIndex] = personEntry;
+  
+          setNodes(arrayCopy); // Update state with the modified node
+          console.log(nodes);
+      } else {
+          ToastQueue.negative('Missing required fields.', { timeout: 1500 });
+      }
+  };
+  
+  
 
     const addOrganization = (name, description, website, request, reminder) => {
       if (name !== '')
@@ -574,6 +589,48 @@ export const AppWrapper = ({children}) => {
       setEditLinkDialog(false);
     }
 
+
+  // Default options for vis-network
+  const [dynamicOptions, setDynamicOptions] = useState(options);
+
+  
+
+  // Function to toggle zoom based on Ctrl key press
+  const handleKeyDown = (event) => {
+    if (event.key === 'Control' || event.key === 'Meta') {  // Meta is for Cmd on macOS
+      setIsCtrlPressed(true);
+    }
+  };
+
+  const handleKeyUp = (event) => {
+    if (event.key === 'Control' || event.key === 'Meta') {
+      setIsCtrlPressed(false);
+    }
+  };
+
+  // Update the dynamic options based on Ctrl press state
+  useEffect(() => {
+    setDynamicOptions((prevOptions) => ({
+      ...prevOptions,
+      interaction: {
+        ...prevOptions.interaction,
+        zoomView: isCtrlPressed,  // Enable zoom when Ctrl is pressed
+      },
+    }));
+  }, [isCtrlPressed]);
+
+  // Set up event listeners for key press events
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
                                       orgDialog, rightClickedNode, rightClickedEdge, propertiesDialog, 
@@ -587,9 +644,33 @@ export const AppWrapper = ({children}) => {
             onContextMenu={(e) => {
               e.preventDefault(); // prevent the default behaviour when right clicked
             }}>
+            <div className="button-container">
+              <button class='addPerson' onClick={() => {
+                  setPersonDialog(true);      // Open the "Add Person" dialog
+                  resetCanvasContextMenu();   // Reset the canvas context menu
+                  }} 
+                  style={{ padding: '10px 20px', 
+                    margin: '5px', 
+                    backgroundColor: 'green', 
+                    color: 'white'
+                  }}>
+                Add Person
+              </button>
+              <button class='addOrg' onClick={() => {
+                  setOrgDialog(true);      // Open the "Add Person" dialog
+                  resetCanvasContextMenu();   // Reset the canvas context menu
+                  }} 
+                  style={{ padding: '10px 20px', 
+                    margin: '5px', 
+                    backgroundColor: 'blue', 
+                    color: 'white' 
+                  }}>
+                Add Organization
+              </button>
+            </div>
               <Graph
                   graph = {state.graph}
-                  options = {options}
+                  options = {dynamicOptions}
                   events = {state.events}
                   getNetwork={setNetworkInstance}
               />
