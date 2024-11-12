@@ -6,6 +6,7 @@ import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
 import {FieldError} from 'react-aria-components';
 import { AppData } from '../components/AppWrapper';
+import CustomFieldsMenu from '../components/contextMenus/CustomFieldsMenu';
 
 export default function IndividualPrayerForm() {
   const { personDialog, closePersonDialog } = AppData();
@@ -90,27 +91,11 @@ function AddPersonDialog() {
           <TextArea name="request" value={request} onChange={setRequest} label="Prayer Request" />
           <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>Add Prayer Reminder?</Checkbox>
 
-          <>
-          {customFields.map((field, index) => (
-            <View key={index} id="custom-fields-container">
-              <TextField
-                name={`customFieldValue${index}`}
-                value={field.value}
-                onChange={(newValue) => updateCustomField(index, 'value', newValue)}
-                label={`${field.name}`}
-                id="text-field"
-                width="100%"
-              />
-              <button
-                type="button"
-                onClick={() => deleteCustomField(index)}
-                className="delete-x"
-              >
-                Delete Field
-              </button>
-            </View>
-          ))}
-          </>
+          <CustomFieldsMenu
+            customFields={customFields}
+            updateCustomField={updateCustomField}
+            deleteCustomField={deleteCustomField}
+          />
 
           <Button onPress={addCustomField} variant="primary" isDisabled={customFields.length >= 4}>
             Add Custom Field

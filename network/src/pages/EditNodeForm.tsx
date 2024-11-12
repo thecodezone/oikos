@@ -6,6 +6,7 @@ import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
 import {FieldError} from 'react-aria-components';
 import { AppData } from '../components/AppWrapper';
+import CustomFieldsMenu from '../components/contextMenus/CustomFieldsMenu';
 
 export default function EditNodeForm() {
   const { editNodeDialog, closeEditNodeDialog, selectedNodeType } = AppData();
@@ -94,51 +95,36 @@ function EditPersonDialog() {
   };
 
   return (
-<Dialog size="S">
-  <Heading>Edit Person Details</Heading>
-  <Content>
-    <Form onSubmit={onSubmit} id="person-form">
-      <TextField name="name" value={name} onChange={setName} label="Subject Name" isRequired />
-      <TextField name="phone" value={phone} onChange={setPhone} label="Phone Number" />
-      <RadioGroup name="status" value={status} onChange={setStatus} label="Subject Status" isRequired>
-        <Radio value="believer">Believer</Radio>
-        <Radio value="seeker">Seeker</Radio>
-      </RadioGroup>
-      <TextArea name="request" value={request} onChange={setRequest} label="Prayer Request" />
-      <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>Add Prayer Reminder?</Checkbox>
+    <Dialog size="S">
+      <Heading>Edit Person Details</Heading>
+      <Content>
+        <Form onSubmit={onSubmit} id="person-form">
+          <TextField name="name" value={name} onChange={setName} label="Subject Name" isRequired />
+          <TextField name="phone" value={phone} onChange={setPhone} label="Phone Number" />
+          <RadioGroup name="status" value={status} onChange={setStatus} label="Subject Status" isRequired>
+            <Radio value="believer">Believer</Radio>
+            <Radio value="seeker">Seeker</Radio>
+          </RadioGroup>
+          <TextArea name="request" value={request} onChange={setRequest} label="Prayer Request" />
+          <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>Add Prayer Reminder?</Checkbox>
 
-      {customFields.map((field, index) => (
-        <View key={index} id="custom-fields-container">
-          <TextField
-            name={`customFieldValue${index}`}
-            value={field.value}
-            onChange={(e) => updateCustomField(index, 'value', e)}
-            label={`${field.name}`}
-            width="100%"
+          <CustomFieldsMenu
+            customFields={customFields}
+            updateCustomField={updateCustomField}
+            deleteCustomField={deleteCustomField}
           />
-          <button
-            type="button"
-            onClick={() => deleteCustomField(index)}
-            className="delete-x"
-            aria-label="Delete custom field"
-          >
-            Delete Field
-          </button>
-        </View>
-      ))}
 
-      <Button onPress={addCustomField} variant="primary" isDisabled={customFields.length >= 4}>
-        Add Custom Field
-      </Button>
+          <Button onPress={addCustomField} variant="primary" isDisabled={customFields.length >= 4}>
+            Add Custom Field
+          </Button>
 
-      <ButtonGroup>
-        <Button type="submit" variant="accent" isDisabled={isDisabled()}>Save</Button>
-        <Button type="reset" variant="primary" onPress={dialog.dismiss}>Cancel</Button>
-      </ButtonGroup>
-    </Form>
-  </Content>
-</Dialog>
-
+          <ButtonGroup>
+            <Button type="submit" variant="accent" isDisabled={isDisabled()}>Save</Button>
+            <Button type="reset" variant="primary" onPress={dialog.dismiss}>Cancel</Button>
+          </ButtonGroup>
+        </Form>
+      </Content>
+    </Dialog>
   );
 }
 
