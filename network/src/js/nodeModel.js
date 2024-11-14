@@ -6,6 +6,7 @@ export class nodeModel {
         this.name = name;
         this.request = request;
         this.reminder = reminder;
+        this.customFields = [];
     }
 
     getID() {

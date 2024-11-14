@@ -1,11 +1,12 @@
 import React from 'react';
 import {Button, ButtonGroup, defaultTheme, TextField, Provider, Checkbox, TextArea, DialogContainer, useDialogContainer} from '@adobe/react-spectrum';
 import {Radio, RadioGroup} from '@adobe/react-spectrum';
-import {Link, Form, Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
+import {View, Link, Form, Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
 import {FieldError} from 'react-aria-components';
 import { AppData } from '../components/AppWrapper';
+import CustomFieldsMenu from '../components/contextMenus/CustomFieldsMenu';
 
 export default function EditNodeForm() {
   const { editNodeDialog, closeEditNodeDialog, selectedNodeType } = AppData();
@@ -107,25 +108,11 @@ function EditPersonDialog() {
           <TextArea name="request" value={request} onChange={setRequest} label="Prayer Request" />
           <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>Add Prayer Reminder?</Checkbox>
 
-          {customFields.map((field, index) => (
-            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <TextField
-                name={`customFieldValue${index}`}
-                value={field.value}
-                onChange={(e) => updateCustomField(index, 'value', e)}
-                label={`${field.name}`}
-                style={{ flexGrow: 1 }}
-              />
-              
-              <button
-                type="button"
-                onClick={() => deleteCustomField(index)}
-                className="delete-x"
-              >
-                X
-              </button>
-            </div>
-          ))}
+          <CustomFieldsMenu
+            customFields={customFields}
+            updateCustomField={updateCustomField}
+            deleteCustomField={deleteCustomField}
+          />
 
           <Button onPress={addCustomField} variant="primary" isDisabled={customFields.length >= 4}>
             Add Custom Field
