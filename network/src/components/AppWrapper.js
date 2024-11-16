@@ -648,23 +648,14 @@ export const AppWrapper = ({children}) => {
               <button class='addPerson' onClick={() => {
                   setPersonDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
-                  }} 
-                  style={{ padding: '10px 20px', 
-                    margin: '5px', 
-                    backgroundColor: 'green', 
-                    color: 'white'
                   }}>
+                  
                 Add Person
               </button>
               <button class='addOrg' onClick={() => {
                   setOrgDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
-                  }} 
-                  style={{ padding: '10px 20px', 
-                    margin: '5px', 
-                    backgroundColor: 'blue', 
-                    color: 'white' 
-                  }}>
+                  }}> 
                 Add Organization
               </button>
             </div>
