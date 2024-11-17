@@ -137,7 +137,7 @@ export const AppWrapper = ({children}) => {
     })
 
     // methods
-    const addPerson = (name, phone, status, request, reminder) => {
+    const addPerson = (name, phone, status, request, reminder, customFields) => {
       if (name !== '' && status !== '')
       {
         name = adjustDuplicateName(name);
@@ -146,7 +146,7 @@ export const AppWrapper = ({children}) => {
         {
             nodeShape = "circle"
         }
-        const newPerson = new Person(name, phone, status, request, reminder)
+        const newPerson = new Person(name, phone, status, request, reminder, customFields)
         const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
