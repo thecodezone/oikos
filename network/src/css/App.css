@@ -14,6 +14,24 @@ body{
   cursor: default;
 }
 
-.addPersonButton{
-  color: green;
+.addPerson{
+  background-color: #ff9770 ;
+  margin: '5px';  
+  color: 'white';
+  font-size: 13px;
+  width: 100px;
+  text-align: center;
+  position: relative;
+  bottom: 100px;
+  left: 100px;
+
+}
+
+.addOrg{
+  margin: '5px'; 
+  background-color: #9EE09E; 
+  color: 'white'; 
+  font-size: 13px;
+  width: 100px;
+  text-align: center;
 }
