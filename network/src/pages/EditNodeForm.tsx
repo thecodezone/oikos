@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, ButtonGroup, defaultTheme, TextField, Provider, Checkbox, TextArea, DialogContainer, useDialogContainer} from '@adobe/react-spectrum';
 import {Radio, RadioGroup} from '@adobe/react-spectrum';
-import {View, Link, Form, Content, Dialog, DialogTrigger} from '@adobe/react-spectrum';
+import {View, Link, Form, Content, Dialog, DialogTrigger, Menu, MenuTrigger, Item} from '@adobe/react-spectrum';
 import {Divider, Header, Heading, Text} from '@adobe/react-spectrum';
 import {ToastContainer} from '@react-spectrum/toast'
 import {FieldError} from 'react-aria-components';
@@ -26,18 +26,25 @@ export default function EditNodeForm() {
   );
 }
 
-// Define a type for the custom field(s)
-type CustomField = { name: string; value: string; };
-
 function EditPersonDialog() {
+  type SuggestedField = { name: string; value: string };
   const { editPerson, nodes, rightClickedNode } = AppData();
   const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo;
-  let [name, setName] = React.useState(currentPerson.getName());
-  let [phone, setPhone] = React.useState(currentPerson.getPhone());
-  let [status, setStatus] = React.useState(currentPerson.getStatus());
-  let [request, setRequest] = React.useState(currentPerson.getRequest());
-  let [reminder, setReminder] = React.useState(currentPerson.getReminder());
-  let [customFields, setCustomFields] = React.useState(currentPerson.getCustomFields() || []); 
+  const [name, setName] = React.useState(currentPerson.getName());
+  const [phone, setPhone] = React.useState(currentPerson.getPhone());
+  const [status, setStatus] = React.useState(currentPerson.getStatus());
+  const [request, setRequest] = React.useState(currentPerson.getRequest());
+  const [reminder, setReminder] = React.useState(currentPerson.getReminder());
+  const [customFields, setCustomFields] = React.useState(currentPerson.getCustomFields() || []);
+  const [suggestedFields, setSuggestedFields] = React.useState<SuggestedField[]>([]);
+
+  const suggestedFieldOptions = [
+    'Initial Contact Date',
+    'Meeting Notes',
+    'Age/Birthday',
+    'Testimony',
+    'Church Attendance',
+  ];
 
   let dialog = useDialogContainer();
 
@@ -52,6 +59,7 @@ function EditPersonDialog() {
     setRequest('');
     setReminder(false);
     setCustomFields([]);
+    setSuggestedFields([]);
   }
 
   function addCustomField() {
@@ -63,27 +71,30 @@ function EditPersonDialog() {
     }
   }
 
-  function updateCustomField(index: number, field: 'name' | 'value', newValue: string) {
-    setCustomFields(customFields.map((f, i) =>
-      i === index ? { ...f, [field]: newValue } : f
-    ));
+  function addSuggestedField(fieldName) {
+    if (!suggestedFields.some((field) => field.name === fieldName)) {
+      setSuggestedFields([...suggestedFields, { name: fieldName, value: '' }]);
+    }
   }
 
-  const deleteCustomField = (index) => {
-    const updatedCustomFields = customFields.filter((_, i) => i !== index);
-    setCustomFields(updatedCustomFields);
-  };
+  function updateFieldValue(fields, setFields, index, newValue) {
+    setFields(
+      fields.map((field, i) => (i === index ? { ...field, value: newValue } : field))
+    );
+  }
+
+  function deleteField(fields, setFields, index) {
+    setFields(fields.filter((_, i) => i !== index));
+  }
 
   let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let data = Object.fromEntries(new FormData(e.currentTarget));
-    
     currentPerson.setName(name);
     currentPerson.setPhone(phone);
     currentPerson.setStatus(status);
     currentPerson.setRequest(request);
     currentPerson.setReminder(reminder);
-    currentPerson.setCustomFields(customFields); 
+    currentPerson.setCustomFields([...customFields, ...suggestedFields]);
 
     const personEntry = { id: currentPerson.getID(), label: currentPerson.getName(), shape: "box", nodeInfo: currentPerson };
     const arrayCopy = [...nodes];
@@ -106,27 +117,78 @@ function EditPersonDialog() {
             <Radio value="seeker">Seeker</Radio>
           </RadioGroup>
           <TextArea name="request" value={request} onChange={setRequest} label="Prayer Request" />
-          <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>Add Prayer Reminder?</Checkbox>
+          <Checkbox name="reminder" isSelected={reminder} onChange={setReminder}>
+            Add Prayer Reminder?
+          </Checkbox>
 
+          <>
+          {/* Display Suggested Fields */}
+          {suggestedFields.map((field, index) => (
+            <View key={`suggested-field-${index}`}>
+              <TextField
+                label={field.name}
+                value={field.value}
+                onChange={(newValue) =>
+                  updateFieldValue(suggestedFields, setSuggestedFields, index, newValue)
+                }
+                width="100%"
+              />
+              <button
+                type="button"
+                onClick={() => deleteField(suggestedFields, setSuggestedFields, index)}
+                className="delete-x"
+                aria-label="Delete suggested field"
+              >
+                Delete Field
+              </button>
+            </View>
+          ))}
+          </>
+          
+          {/* Display Custom Fields */}
           <CustomFieldsMenu
             customFields={customFields}
-            updateCustomField={updateCustomField}
-            deleteCustomField={deleteCustomField}
+            updateCustomField={(index, field, value) =>
+              updateFieldValue(customFields, setCustomFields, index, value)
+            }
+            deleteCustomField={(index) =>
+              deleteField(customFields, setCustomFields, index)
+            }
           />
 
+          {/* Add Suggested Fields Menu */}
+          <MenuTrigger>
+            <Button variant="primary" isDisabled={suggestedFields.length >= suggestedFieldOptions.length}>
+              Add Suggested Fields
+            </Button>
+            <Menu onAction={(key) => addSuggestedField(key)} aria-label="Suggested Fields">
+              {suggestedFieldOptions
+                .filter((option) => !suggestedFields.some((field) => field.name === option))
+                .map((option) => (
+                  <Item key={option}>{option}</Item>
+                ))}
+            </Menu>
+          </MenuTrigger>
+
+          {/* Add Custom Field Button */}
           <Button onPress={addCustomField} variant="primary" isDisabled={customFields.length >= 4}>
             Add Custom Field
           </Button>
 
           <ButtonGroup>
-            <Button type="submit" variant="accent" isDisabled={isDisabled()}>Save</Button>
-            <Button type="reset" variant="primary" onPress={dialog.dismiss}>Cancel</Button>
+            <Button type="submit" variant="accent" isDisabled={isDisabled()}>
+              Save
+            </Button>
+            <Button type="reset" variant="primary" onPress={dialog.dismiss}>
+              Cancel
+            </Button>
           </ButtonGroup>
         </Form>
       </Content>
     </Dialog>
   );
 }
+
 
 function EditOrgDialog() {
   const { editOrganization, nodes, rightClickedNode } = AppData();

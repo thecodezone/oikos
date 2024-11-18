@@ -15,7 +15,7 @@ const CustomFieldList = ({ customFields, updateCustomField, deleteCustomField })
             id="text-field"
             width="100%"
           />
-          <button
+          <button 
             type="button"
             onClick={() => deleteCustomField(index)}
             className="delete-x"
