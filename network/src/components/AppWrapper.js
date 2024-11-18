@@ -223,6 +223,7 @@ export const AppWrapper = ({children}) => {
     const handleNodeDelete = () => {
       if (selectedNodes.length > 0) {
         deleteNodes(selectedNodes);  // Pass the array of selected nodes for deletion
+        setSelectedNodes([]);
       } else {
         deleteNode(rightClickedNode);  // Delete just the right-clicked node
       }
