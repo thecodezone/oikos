@@ -52,7 +52,7 @@
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
 }
 
-.delete-x {
+.delete-x, #delete-x {
     margin-top: 6px;
     margin-bottom: 4px;
     opacity: 1;
@@ -67,7 +67,7 @@
     padding-right: 10px;
 }
 
-.delete-x:hover {
+.delete-x:hover, #delete-x:hover {
     background-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
@@ -109,7 +109,7 @@
     margin-bottom: '10px';
 }
 
-.custom-fields-container {
+.custom-fields-container, .suggested-fields-container {
     display: 'flex';
     flex-direction: row;
     align-items: center;
