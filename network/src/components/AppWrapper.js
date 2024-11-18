@@ -640,13 +640,12 @@ export const AppWrapper = ({children}) => {
   
   // only grabs the entity nodes (Person/Org)
   const entitySelection = selectedNodes.filter(nodeId => {
-    const node = nodes.find(n => n.id === nodeId).nodeInfo;
-    
-    if (node) {
-      return node instanceof Person || node instanceof Organization;
-    } else {
-      return false;
+    const node = nodes.find(n => n.id === nodeId);
+    if (node && node.nodeInfo) {
+      return node.nodeInfo instanceof Person || node.nodeInfo instanceof Organization;
     }
+    // Return false if no valid nodeInfo found
+    return false;
   });
 
   
