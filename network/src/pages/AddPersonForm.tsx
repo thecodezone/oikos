@@ -43,6 +43,7 @@ function AddPersonDialog() {
   const [reminder, setReminder] = React.useState(false);
   const [customFields, setCustomFields] = React.useState<Field[]>([]);
   const [suggestedFields, setSuggestedFields] = React.useState<Field[]>([]);
+  type CustomField = { name: string; value: string; };
 
   let dialog = useDialogContainer();
   const { addPerson } = AppData();

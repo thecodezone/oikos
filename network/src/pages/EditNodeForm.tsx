@@ -144,7 +144,6 @@ function EditPersonDialog() {
             </View>
           ))}
           </>
-
           
           {/* Display Custom Fields */}
           <CustomFieldsMenu
