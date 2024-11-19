@@ -718,10 +718,11 @@ export const AppWrapper = ({children}) => {
                                       closePropertiesDialog, updateColorAndShape, deleteNode, deleteEdge,
                                       closeLinkDialog, closeEditLinkDialog}}>
             {children}
-            <div className="button-container"
+            <div className='container'
             onContextMenu={(e) => {
               e.preventDefault(); // prevent the default behaviour when right clicked
             }}>
+            <div className="button-container">
               <button class='addPerson' onClick={() => {
                   setPersonDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
@@ -816,6 +817,7 @@ export const AppWrapper = ({children}) => {
                   },
                 ]}
               />
+            </div>
         </AppContext.Provider>
     )
 }

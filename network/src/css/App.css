@@ -22,8 +22,8 @@ body{
   width: 100px;
   text-align: center;
   position: relative;
-  bottom: -320px;
-  left: -550px;
+  bottom: 100px;
+  left: 100px;
 
 }
 
@@ -34,7 +34,4 @@ body{
   font-size: 13px;
   width: 100px;
   text-align: center;
-  position: relative;
-  left:-650px;
-  bottom: -200px;
 }
