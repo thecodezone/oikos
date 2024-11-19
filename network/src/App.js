@@ -36,6 +36,9 @@ function App() {
       center={[51.505, -0.09]} // Set initial center
       zoom={13} // Set initial zoom
       ref={mapRef} // Attach the ref to the MapContainer
+      style={{
+        height: '100%'
+      }}
     >
       
       <Header />
