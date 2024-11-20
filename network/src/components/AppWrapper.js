@@ -649,8 +649,6 @@ export const AppWrapper = ({children}) => {
     return false;
   });
 
-  
-
   // Update the dynamic options based on Ctrl press state
   useEffect(() => {
     setDynamicOptions((prevOptions) => ({
@@ -711,7 +709,6 @@ export const AppWrapper = ({children}) => {
     }
   };
 
-
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
                                       orgDialog, rightClickedNode, rightClickedEdge, propertiesDialog, 
@@ -730,7 +727,6 @@ export const AppWrapper = ({children}) => {
                   setPersonDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
                   }}>
-                  
                 Add Person
               </button>
               <button class='addOrg' onClick={() => {

@@ -189,7 +189,6 @@ function EditPersonDialog() {
   );
 }
 
-
 function EditOrgDialog() {
   const { editOrganization, nodes, rightClickedNode } = AppData();
   const currentOrganization = nodes.find(x => x.id === rightClickedNode).nodeInfo
