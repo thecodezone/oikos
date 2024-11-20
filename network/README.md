@@ -68,3 +68,57 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+<br>
+
+# How to access the app on a mobile device
+## Quick Guide
+After running `npm start` you will be automatically directed to your browser. After the application opens on your browser, return to your terminal. In your terminal, you should find two lines labeled `Local:` & `On Your Network:`. If you copy the URL from the `On Your Network` line and paste it into your mobile browser, it should open the React application.
+### Terminal Example
+![alt text](../img/image-1.png)
+
+<br>
+
+## Step by step
+### Mac
+* **Step 1:**
+Make sure the desktop device that the app is running on and your mobile device are connected to the same network
+
+* **Step 2:**
+Open Settings
+
+* **Step 3:**
+Open the `Wi-Fi` menu
+
+* **Step 4:**
+Click `Detials`. Alternatively, you can click this icon: <div style="display: inline-block; width: 24px; height: 24px; border: 2px solid white; border-radius: 50%; text-align: center; line-height: 24px; font-size: 12px;">•••</div> &nbsp;&nbsp;then click `Network settings...`
+
+* **Step 5:**
+Find your IP address for that network Under the `IP address` section. Example IP: `10.14.215.12`
+
+* **Step 6:**
+On your mobile device, open a browser and enter the IP address followed by a colon and the port that the React app runs on. This project runs on port 3000. Example: `10.14.215.12:3000`
+
+* **Note:**
+With the current implementation of the application, it is likely that any database interactions with DynamoDB will not work when accessing the app on your mobile device
+
+### Windows
+* **Step 1:** Make sure the desktop device that the app is running on and your mobile device are connected to the same network
+
+* **Step 2:** 
+Open Settings
+
+* **Step 3:** 
+Open the `Network & Internet` menu
+
+* **Step 4:** 
+Click the Wifi network that your desktop and mobile device are connected to.
+
+* **Step 5:** 
+Under `Properties`, scroll down to see the `IPv4 address` row to find your IP address for that network. Example IP: `10.14.200.10`
+
+* **Step 6:** 
+On your mobile device, open a browser and enter the IP address followed by a colon and the port that the React app runs on. This project runs on port 3000. Example: `10.14.200.10:3000`
+
+* **Note:** 
+With the current implementation of the application, it is likely that any database interactions with DynamoDB will not work when accessing the app on your mobile device
