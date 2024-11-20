@@ -53,6 +53,9 @@ export const AppWrapper = ({children}) => {
     const [rightClickedNode, setRightClickedNode] = useState(null);
     const [rightClickedEdge, setRightClickedEdge] = useState(null);
     const [selectedNodeType, setSelectedNodeType] = useState(null);
+    const [selectedNodes, setSelectedNodes] = useState([]);
+    const [dynamicOptions, setDynamicOptions] = useState(options);
+    const isCtrlPressedRef = useRef(false);
 
     function resetRightClickedNode() {
       setRightClickedNode(null);
@@ -62,19 +65,14 @@ export const AppWrapper = ({children}) => {
       setRightClickedEdge(null);
     }
 
-    function resetRightClickedEdge() {
-        setRightClickedEdge(null);
-    }
-
     let [state, setState] = useState({
       graph: {nodes: nodes, edges: edges},
       events: {
-          select: ({ nodes, edges }) => {
-            //console.log("Selected nodes:");
-            //console.log(nodes);
-            //console.log("Selected edges:");
-            //console.log(edges);
-            //alert("Selected node: " + nodes);
+          selectNode: (event) => {
+            const nodeId = event.nodes[0]; 
+            if (nodeId) {
+              handleNodeClick(nodeId);
+            }
           },
           doubleClick: ({ pointer: { canvas } }) => {
             //AlertDialog();
@@ -98,41 +96,40 @@ export const AppWrapper = ({children}) => {
               y: yPos,
             })
             if (nodeID !== undefined) {
-              console.log(`node selected: ${nodeID}`);
-              setRightClickedNode(nodeID)
-              const currentNodeType = nodes.find(x => x.id === nodeID).nodeInfo
-              if (currentNodeType !== undefined)
-              {
-                if (currentNodeType instanceof Person) 
-                {
-                  setSelectedNodeType('person')
+              // If the Ctrl key is pressed, toggle the selection of the node
+              if (isCtrlPressedRef) {
+                if (selectedNodes.includes(nodeID)) {
+                  setSelectedNodes(prev => prev.filter(id => id !== nodeID)); // Deselect
+                } else {
+                  setSelectedNodes(prev => [...prev, nodeID]); // Select
                 }
-                else
-                {
-                  setSelectedNodeType('organization')
+              } else {
+                // If no modifier key, clear selection and select the current node
+                setSelectedNodes([nodeID]);
+              }
+              
+              setRightClickedNode(nodeID);
+              const currentNodeType = nodes.find(x => x.id === nodeID).nodeInfo;
+              
+              if (currentNodeType !== undefined) {
+                if (currentNodeType instanceof Person) {
+                  setSelectedNodeType('person');
+                } else {
+                  setSelectedNodeType('organization');
                 }
               }
-              console.log(selectedNodeType)
-              resetRightClickedEdge()
-              resetEdgeContextMenu()
-              resetCanvasContextMenu()
-              handleNodeOnContextMenu(event)
-            }
-            else if (edgeID !== undefined) {
-              console.log(`edge selected: ${edgeID}`);
-              setRightClickedEdge(edgeID)
-              resetRightClickedNode()
-              resetNodeContextMenu()
-              resetCanvasContextMenu()
-              handleEdgeOnContextMenu(event)
-            }
-            else {
-              console.log(`canvas background selected`)
-              resetRightClickedNode()
-              resetRightClickedEdge()
-              resetNodeContextMenu()
-              resetEdgeContextMenu()
-              handleCanvasOnContextMenu(event)
+              resetEdgeContextMenu();
+              resetCanvasContextMenu();
+              handleNodeOnContextMenu(event);
+            } else if (edgeID !== undefined) {
+              setRightClickedEdge(edgeID);
+              resetNodeContextMenu();
+              resetCanvasContextMenu();
+              handleEdgeOnContextMenu(event);
+            } else {
+              resetNodeContextMenu();
+              resetEdgeContextMenu();
+              handleCanvasOnContextMenu(event);
             }
           }
         },
@@ -140,7 +137,7 @@ export const AppWrapper = ({children}) => {
     })
 
     // methods
-    const addPerson = (name, phone, status, request, reminder) => {
+    const addPerson = (name, phone, status, request, reminder, customFields) => {
       if (name !== '' && status !== '')
       {
         name = adjustDuplicateName(name);
@@ -149,7 +146,7 @@ export const AppWrapper = ({children}) => {
         {
             nodeShape = "circle"
         }
-        const newPerson = new Person(name, phone, status, request, reminder)
+        const newPerson = new Person(name, phone, status, request, reminder, customFields)
         const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
@@ -223,6 +220,30 @@ export const AppWrapper = ({children}) => {
       }
     }
 
+    const handleNodeDelete = () => {
+      if (selectedNodes.length > 0) {
+        deleteNodes(selectedNodes);  // Pass the array of selected nodes for deletion
+        setSelectedNodes([]);
+      } else {
+        deleteNode(rightClickedNode);  // Delete just the right-clicked node
+      }
+    };
+
+    const deleteNodes = (nodeIDs) => {
+      const updatedNodes = nodes.filter(node => !nodeIDs.includes(node.id));  // filter out the selected nodes
+      const updatedEdges = edges.filter(edge => !nodeIDs.includes(edge.from) && !nodeIDs.includes(edge.to));  // filter related edges
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
+      setState(prevState => ({
+        ...prevState,
+        graph: {
+          nodes: updatedNodes,
+          edges: updatedEdges
+        }
+      }));
+      ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
+    };
+
     const editOrganization = (name, description, website, request, reminder) => {
         if (name !== '')
         {
@@ -282,12 +303,12 @@ export const AppWrapper = ({children}) => {
         setState({
           graph: {nodes: nodes, edges: edges},
           events: {
-            select: ({ nodes, edges }) => {
-              //console.log("Selected nodes:");
-              //console.log(nodes);
-              //console.log("Selected edges:");
-              //console.log(edges);
-              //alert("Selected node: " + nodes);
+            selectNode: (event) => {
+              // Assuming event contains the nodeId that was clicked
+              const nodeId = event.nodes[0]; // event.nodes is an array of clicked node IDs
+              if (nodeId) {
+                handleNodeClick(nodeId);  // Call the multi-selection handler
+              }
             },
             doubleClick: ({ pointer: { canvas } }) => {
               //AlertDialog();
@@ -311,40 +332,41 @@ export const AppWrapper = ({children}) => {
                 y: yPos,
               })
               if (nodeID !== undefined) {
-                console.log(`node selected: ${nodeID}`);
-                setRightClickedNode(nodeID)
-                const currentNodeType = nodes.find(x => x.id === nodeID).nodeInfo
-                console.log(nodes.find(x => x.id === nodeID))
-                if (currentNodeType !== undefined)
-                {
-                  if (currentNodeType instanceof Person) 
-                  {
-                    setSelectedNodeType('person')
+                // If the Ctrl key is pressed, toggle the selection of the node
+                if (isCtrlPressedRef) {
+                  if (selectedNodes.includes(nodeID)) {
+                    
+                    setSelectedNodes(prev => prev.filter(id => id !== nodeID)); // Deselect
+                  } else {
+                    setSelectedNodes(prev => [...prev, nodeID]); // Select
                   }
-                  else
-                  {
-                    setSelectedNodeType('organization')
+                } else {
+                  // If no modifier key, clear selection and select the current node
+                  setSelectedNodes([nodeID]);
+                }
+                
+                setRightClickedNode(nodeID);
+                const currentNodeType = nodes.find(x => x.id === nodeID).nodeInfo;
+                
+                if (currentNodeType !== undefined) {
+                  if (currentNodeType instanceof Person) {
+                    setSelectedNodeType('person');
+                  } else {
+                    setSelectedNodeType('organization');
                   }
                 }
-                console.log(selectedNodeType)
-                resetEdgeContextMenu()
-                resetCanvasContextMenu()
-                handleNodeOnContextMenu(event)
-              }
-              else if (edgeID !== undefined)
-              {
-                console.log(`edge selected: ${edgeID}`);
-                setRightClickedEdge(edgeID)
-                resetNodeContextMenu()
-                resetCanvasContextMenu()
-                handleEdgeOnContextMenu(event)
-              }
-              else
-              {
-                console.log(`canvas background selected`)
-                resetNodeContextMenu()
-                resetEdgeContextMenu()
-                handleCanvasOnContextMenu(event)
+                resetEdgeContextMenu();
+                resetCanvasContextMenu();
+                handleNodeOnContextMenu(event);
+              } else if (edgeID !== undefined) {
+                setRightClickedEdge(edgeID);
+                resetNodeContextMenu();
+                resetCanvasContextMenu();
+                handleEdgeOnContextMenu(event);
+              } else {
+                resetNodeContextMenu();
+                resetEdgeContextMenu();
+                handleCanvasOnContextMenu(event);
               }
             }
           },
@@ -437,6 +459,7 @@ export const AppWrapper = ({children}) => {
 
     const setNetworkInstance = nw => {
       state.network = nw;
+      setupEventListeners(nw);
     };
 
     // context menus
@@ -590,23 +613,41 @@ export const AppWrapper = ({children}) => {
     }
 
 
-  // Default options for vis-network
-  const [dynamicOptions, setDynamicOptions] = useState(options);
-
-  
-
-  // Function to toggle zoom based on Ctrl key press
   const handleKeyDown = (event) => {
-    if (event.key === 'Control' || event.key === 'Meta') {  // Meta is for Cmd on macOS
-      setIsCtrlPressed(true);
+    if (event.key === 'Control' || event.key === 'Meta') { 
+      isCtrlPressedRef.current = true;
+      setIsCtrlPressed(true); 
     }
   };
 
   const handleKeyUp = (event) => {
     if (event.key === 'Control' || event.key === 'Meta') {
+      isCtrlPressedRef.current = false;  // Update ref
       setIsCtrlPressed(false);
     }
   };
+
+  const handleCanvasClick = (event) => {
+    setSelectedNodes([]);  // Deselect all nodes on background click
+  };
+
+  const setupEventListeners = (network) => {
+    network.on('click', (event) => {
+      if (!event.nodes.length) {
+        handleCanvasClick(event);
+      }
+    });
+  };
+  
+  // only grabs the entity nodes (Person/Org)
+  const entitySelection = selectedNodes.filter(nodeId => {
+    const node = nodes.find(n => n.id === nodeId);
+    if (node && node.nodeInfo) {
+      return node.nodeInfo instanceof Person || node.nodeInfo instanceof Organization;
+    }
+    // Return false if no valid nodeInfo found
+    return false;
+  });
 
   // Update the dynamic options based on Ctrl press state
   useEffect(() => {
@@ -631,10 +672,44 @@ export const AppWrapper = ({children}) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (state.network && selectedNodes.length > 0) {
+      state.network.selectNodes(selectedNodes);  
+    } else if (state.network) {
+      state.network.unselectAll();  
+    }
+  }, [selectedNodes, state.network]); 
+
+  // working on finding a way for deselect but i think out of scope - separate task
+  const handleNodeClick = (nodeId) => {
+    const isCtrlHeldDown = isCtrlPressedRef.current; 
+    console.log('Ctrl pressed:', isCtrlHeldDown);
+    console.log('Node clicked:', nodeId);
+
+    if (isCtrlHeldDown) {
+      setSelectedNodes((prevSelectedNodes) => {
+        if (prevSelectedNodes.includes(nodeId)) { 
+          return prevSelectedNodes.filter((id) => id !== nodeId);
+        } else {
+          return [...prevSelectedNodes, nodeId];
+          
+        }
+      });
+    } else {
+      setSelectedNodes((prevSelectedNodes) => {
+        if (prevSelectedNodes.includes(nodeId)) {
+          return prevSelectedNodes.filter((id) => id !== nodeId);
+        } else {
+          return [nodeId];
+        }
+      });
+    }
+  };
+
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
                                       orgDialog, rightClickedNode, rightClickedEdge, propertiesDialog, 
-                                      linkDialog, editLinkDialog, selectedNodeType, addPerson, editPerson, addOrganization, 
+                                      linkDialog, editLinkDialog, selectedNodeType, selectedNodes, addPerson, editPerson, addOrganization, 
                                       editOrganization, addEdge, editEdge, closePersonDialog, closeEditNodeDialog, 
                                       closeOrgDialog, resetRightClickedNode, resetRightClickedEdge,
                                       closePropertiesDialog, updateColorAndShape, deleteNode, deleteEdge,
@@ -648,30 +723,20 @@ export const AppWrapper = ({children}) => {
               <button class='addPerson' onClick={() => {
                   setPersonDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
-                  }} 
-                  style={{ padding: '10px 20px', 
-                    margin: '5px', 
-                    backgroundColor: 'green', 
-                    color: 'white'
                   }}>
                 Add Person
               </button>
               <button class='addOrg' onClick={() => {
                   setOrgDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
-                  }} 
-                  style={{ padding: '10px 20px', 
-                    margin: '5px', 
-                    backgroundColor: 'blue', 
-                    color: 'white' 
-                  }}>
+                  }}> 
                 Add Organization
               </button>
             </div>
               <Graph
-                  graph = {state.graph}
-                  options = {dynamicOptions}
-                  events = {state.events}
+                  graph={state.graph}
+                  options={dynamicOptions}
+                  events={state.events}
                   getNetwork={setNetworkInstance}
               />
               <NodeContextMenu 
@@ -679,28 +744,38 @@ export const AppWrapper = ({children}) => {
                 isToggled={nodeContextMenu.toggled}
                 positionX={points.x}
                 positionY={points.y}
-                buttons={[
-                  {
-                    text: "Add Link",
-                    icon: "➕",
-                    onClick: () => {setLinkDialog(true); resetNodeContextMenu()},
-                  },
-                  {
-                    text: "Edit Info",
-                    icon: "",
-                    onClick: () => {setEditNodeDialog(true); resetNodeContextMenu()},
-                  },
-                  {
-                    text: "Properties",
-                    icon:"",
-                    onClick: () => {setPropertiesDialog(true); resetNodeContextMenu()},
-                  },
-                  {
-                    text: "Delete Node",
-                    icon: "",
-                    onClick: () => {deleteNode(rightClickedNode); resetNodeContextMenu()},
-                  }
-                ]}
+                buttons={
+                  entitySelection.length > 2
+                    ? [ // Show only "Delete Selected Nodes" if more than one node is selected
+                        {
+                          text: "Delete Selected Nodes",
+                          icon: "",
+                          onClick: () => { handleNodeDelete(); resetNodeContextMenu() },
+                        }
+                      ]
+                    : [ // Show full set of buttons if one or no node is selected
+                        {
+                          text: "Add Link",
+                          icon: "➕",
+                          onClick: () => { setLinkDialog(true); resetNodeContextMenu() },
+                        },
+                        {
+                          text: entitySelection > 1 ? "Edit Selected Nodes" : "Edit Info",
+                          icon: "",
+                          onClick: () => { setEditNodeDialog(true); resetNodeContextMenu() },
+                        },
+                        {
+                          text: "Properties",
+                          icon:"",
+                          onClick: () => { setPropertiesDialog(true); resetNodeContextMenu() },
+                        },
+                        {
+                          text: entitySelection > 1 ? "Delete Selected Nodes" : "Delete Node",
+                          icon: "",
+                          onClick: () => { handleNodeDelete(); resetNodeContextMenu() },
+                        }
+                      ]
+                }
               />
               <EdgeContextMenu
                 contextMenuRef={contextMenuRef}
