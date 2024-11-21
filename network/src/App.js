@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useState, useRef, useEffect} from 'react';
+import axios from 'axios'
 import './css/App.css';
 import IndividualPrayerForm from './pages/AddPersonForm.tsx';
 import OrgPrayerForm from './pages/AddOrgForm.tsx';
@@ -25,6 +26,19 @@ function App() {
       return;
     }
   };
+
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // Fetch data from the Node.js server
+    axios.get('/api/message')
+        .then(response => {
+            setMessage(response.data.message);
+        })
+        .catch(error => {
+            console.error('There was an error!', error);
+        });
+}, []);
 
   return (
     <div
