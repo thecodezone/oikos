@@ -1,10 +1,14 @@
 // server.js
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import apiapp from './api.js';
+
 const app = express();
 
 app.use(cors());
 app.use(express.json()); // To parse JSON request bodies
+
+app.use("/api", apiapp);
 
 // Sample endpoint
 app.get('/api/message', (req, res) => {
