@@ -11,7 +11,8 @@ app.use(express.json()); // To parse JSON request bodies
 app.use("/api", apiapp);
 
 // Sample endpoint
-app.get('/api/message', (req, res) => {
+app.get('/message', (req, res) => {
+    // ".../message" to test directly in browser
     res.json({ message: 'Hello from the server!' });
 });
 
