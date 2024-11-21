@@ -685,6 +685,10 @@ export const AppWrapper = ({children}) => {
     const isCtrlHeldDown = isCtrlPressedRef.current; 
     console.log('Ctrl pressed:', isCtrlHeldDown);
     console.log('Node clicked:', nodeId);
+    
+    const clickedNode = nodes.find(x => x.id === nodeId);
+    console.log(clickedNode);
+    console.log(clickedNode.nodeInfo);
 
     if (isCtrlHeldDown) {
       setSelectedNodes((prevSelectedNodes) => {
