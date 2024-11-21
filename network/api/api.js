@@ -1,6 +1,10 @@
 import {addNode, deleteNode, updateNode} from "./apiFunctions"
+import { Router } from "express";
 import dotenv from "dotenv";
+
 dotenv.config()
+
+const app = Router();
 
 app.post('/addNode', (req, res) => {
     // TODO: Add schema validation
@@ -39,3 +43,5 @@ app.post('/updateNode', (req, res) => {
         res.json(returnVal);
     });
 });
+
+export default app;
