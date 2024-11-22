@@ -1,6 +1,16 @@
-import {addNode, deleteNode, updateNode} from "./apiFunctions"
+import {addNode, deleteNode, updateNode} from "./apiFunctions.js"
+import { Router } from "express";
 import dotenv from "dotenv";
+
 dotenv.config()
+
+const app = Router();
+
+// Sample endpoints
+app.get('/testRoutes', (req, res) => {
+    // ".../api/testRoutes" to test directly in browser
+    res.json({ message: 'Hello from the API routes!' });
+});
 
 app.post('/addNode', (req, res) => {
     // TODO: Add schema validation
@@ -39,3 +49,5 @@ app.post('/updateNode', (req, res) => {
         res.json(returnVal);
     });
 });
+
+export default app;
