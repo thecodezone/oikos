@@ -12,7 +12,7 @@
 <br>
 
 ## DynamoDB Nodes Table Schema 
-|     | <span class="green">Partition Key</span> | <span class="green">Sort Key</span> | <span class="light-blue">Rest of data</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> |
+|     | <span class="green">Partition Key</span> | <span class="green">Sort Key</span> | <span class="light-blue">Rest of Data</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> | <span class="light-blue">"</span> |
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
 | <span class="light-blue">**Column Names**</span> | <span class="string-red">Partition</span> | <span class="string-red">NodeID</span> | <span class="string-red">Type</span> | <span class="string-red">Shape</span> | <span class="string-red">Name</span> | <span class="string-red">Phone</span> | <span class="string-red">Reminder</span> | <span class="string-red">Request</span> | <span class="string-red">Status</span> | <span class="string-red">CustomFields</span> | <span class="string-red">Website</span> | <span class="string-red">Description</span> |
 | <span class="light-blue">**Dummy Data**</span> | Development | 1a7e2bf7-644c-4d32-849e-62097716b0b7 | Person | box | Blank | 123-456-7890 | false | This is my prayer request | seeker | [{name: "Key1", value: "Value1"}, {name: "Testimony", value: "Value"}] | <span class="blue">None</span> | <span class="blue">None</span> |
@@ -108,7 +108,7 @@ Object {
     name: {S: "Some Org"} // Same value as 'label' key
     reminder: {BOOL: false}
     request: {S: ""}
-    website: {S: "some url"} // has validation for url type required
+    website: {S: "Some URL"} // has validation for url type required
 }
 ```
 
