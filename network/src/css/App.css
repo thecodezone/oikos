@@ -7,7 +7,7 @@
   --reset-url-path:   url('../../img/reset-94D1E6.png');
 }
 
-body{
+body {
   background-color: rgb(47, 54, 61);
 }
 
@@ -15,7 +15,7 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }
 
 .header {
@@ -117,6 +117,36 @@ body{
   background-image: var(--arrow-url-path) !important;
 }
 
-/* .container {
-  background-color: #9EE09E !important;
-} */
+.container > div:nth-child(1) {
+  height: auto !important;
+}
+
+.container {
+  max-height: fit-content !important;
+}
+
+.vis-network {
+  /* Box shadow can be removed to hid div seam until fixed */
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7); 
+  max-height: 100vh !important;
+}
+
+/* Adjust for mobile screens */
+@media (max-width: 768px) {
+  body {
+    overflow: hidden;
+  }
+
+  #listHeader button  {
+    max-width: fit-content;
+    font-size: 14px;
+  }
+
+  .header {
+    font-size: 24px;
+  }
+
+  canvas, .vis-network {
+    max-height: 72vh !important;
+  }
+}
