@@ -55,7 +55,7 @@ export default function ViewListForm() {
   };
   
   return (
-    <Provider theme={defaultTheme}>
+    <Provider theme={defaultTheme} id="listHeader">
       <ToastContainer />
       <DialogTrigger isDismissable mobileType='tray'>
         <ActionButton>View List</ActionButton>

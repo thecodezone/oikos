@@ -685,7 +685,7 @@ export const AppWrapper = ({children}) => {
     const isCtrlHeldDown = isCtrlPressedRef.current; 
     console.log('Ctrl pressed:', isCtrlHeldDown);
     console.log('Node clicked:', nodeId);
-    
+
     const clickedNode = nodes.find(x => x.id === nodeId);
     console.log(clickedNode);
     console.log(clickedNode.nodeInfo);
@@ -710,6 +710,40 @@ export const AppWrapper = ({children}) => {
     }
   };
 
+    useEffect(() => {
+      const existingElement = document.getElementById('listHeader');
+    
+      if (existingElement) {
+        console.log('Found existing element:', existingElement);
+        const buttonContainer = document.createElement("div")
+        buttonContainer.innerHTML = `
+            <button class="addPerson">Add Person</button>
+            <button class="addOrg">Add Organization</button>
+        `;
+    
+        const addPersonButton = buttonContainer.querySelector('.addPerson');
+        const addOrgButton = buttonContainer.querySelector('.addOrg');
+    
+        addPersonButton.addEventListener('click', () => {
+          setPersonDialog(true); // Open the "Add Person" dialog
+          resetCanvasContextMenu(); // Reset the canvas context menu
+        });
+    
+        addOrgButton.addEventListener('click', () => {
+          setOrgDialog(true); // Open the "Add Organization" dialog
+          resetCanvasContextMenu(); // Reset the canvas context menu
+        });
+
+        existingElement.append(buttonContainer);
+        
+      } else {
+        console.log('Element not found');
+      }
+    }, []);
+  
+
+
+
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
                                       orgDialog, rightClickedNode, rightClickedEdge, propertiesDialog, 
@@ -723,7 +757,7 @@ export const AppWrapper = ({children}) => {
             onContextMenu={(e) => {
               e.preventDefault(); // prevent the default behaviour when right clicked
             }}>
-            <div className="button-container">
+            {/* <div className="button-container">
               <button class='addPerson' onClick={() => {
                   setPersonDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
@@ -736,7 +770,7 @@ export const AppWrapper = ({children}) => {
                   }}> 
                 Add Organization
               </button>
-            </div>
+            </div> */}
               <Graph
                   graph={state.graph}
                   options={dynamicOptions}

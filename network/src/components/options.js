@@ -7,7 +7,10 @@ export const options = {
         zoomView: false
     },
     edges: {
-        color: "yellow"
+        color: "lightgrey"
+    },
+    nodes: {
+        color: "lightblue",
     },
     height: "650px"
 }

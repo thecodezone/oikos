@@ -1,5 +1,5 @@
 body{
-  background-color: black;
+  background-color: rgb(47, 54, 61);
 }
 
 .container{
@@ -9,29 +9,56 @@ body{
   min-height: 100vh;
 }
 
-.header{
+.header {
+  text-align: center;
   color: white;
   cursor: default;
 }
 
-.addPerson{
-  background-color: #ff9770 ;
-  margin: '5px';  
-  color: 'white';
-  font-size: 13px;
-  width: 100px;
-  text-align: center;
-  position: relative;
-  bottom: 100px;
-  left: 100px;
+#listHeader {
+  display: flex;
+  flex-direction: row; 
+  align-items: center; 
+  justify-content: center; 
+  background-color: lightgrey;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7); 
 
 }
 
+#listHeader button {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-right: 5px !important;
+  margin-left: 5px !important;
+  opacity: 1;
+  font-family: Arial, sans-serif;
+  background: none;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid white;
+  color: white;
+  background-color: rgb(47, 54, 61);
+  height: 32px;
+  font-size: 16px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+  padding-left: 10px;
+  padding-right: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#listHeader button:hover {
+  background-color: rgba(47, 54, 61, 0.5);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.addPerson{
+  background-color: #ff9770 ;  
+  color: 'white';
+  text-align: center;
+}
+
 .addOrg{
-  margin: '5px'; 
   background-color: #9EE09E; 
   color: 'white'; 
-  font-size: 13px;
-  width: 100px;
   text-align: center;
 }
