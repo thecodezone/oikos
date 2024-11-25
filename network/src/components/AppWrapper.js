@@ -309,7 +309,6 @@ export const AppWrapper = ({children}) => {
               // Assuming event contains the nodeId that was clicked
               const nodeId = event.nodes[0]; // event.nodes is an array of clicked node IDs
               if (nodeId) {
-                console.log("TEST")
                 handleSetNodeClicked(event);
                 handleNodeClick(nodeId);  // Call the multi-selection handler
                 handleCanvasOnContextMenu(true);
