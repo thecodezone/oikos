@@ -1,3 +1,12 @@
+
+/* Add or remove '--94D1E6' to chnage colors */
+:root {
+  --arrow-url-path:   url('../../img/arrow-94D1E6.png');
+  --zoomIn-url-path:   url('../../img/plus-94D1E6.png');
+  --zoomOut-url-path: url('../../img/minus-94D1E6.png');
+  --reset-url-path:   url('../../img/reset-94D1E6.png');
+}
+
 body{
   background-color: rgb(47, 54, 61);
 }
@@ -62,3 +71,52 @@ body{
   color: 'white'; 
   text-align: center;
 }
+
+/* Navigation buttons */
+.vis-button {
+  background-color: rgb(148, 209, 230) !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 88%;
+  transition: box-shadow 0.2s ease; 
+}
+
+.vis-button:hover {
+  box-shadow: 0 0 8px 3px lightblue !important;
+}
+
+.vis-zoomExtends {
+  background-image: var(--reset-url-path) !important;
+}
+
+.vis-zoomIn {
+  background-image: var(--zoomIn-url-path) !important;
+}
+
+.vis-zoomOut {
+  background-image: var(--zoomOut-url-path) !important;
+}
+
+.vis-up {
+  background-image: var(--arrow-url-path) !important;
+  transform: rotate(270deg); 
+}
+
+.vis-down {
+  background-image: var(--arrow-url-path) !important;
+  transform: rotate(90deg); 
+}
+
+.vis-left {
+  background-image: var(--arrow-url-path) !important;
+  transform: rotate(180deg); 
+}
+
+.vis-right {
+  background-image: var(--arrow-url-path) !important;
+}
+
+/* .container {
+  background-color: #9EE09E !important;
+} */

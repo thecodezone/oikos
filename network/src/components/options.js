@@ -10,7 +10,7 @@ export const options = {
         color: "lightgrey"
     },
     nodes: {
-        color: "lightblue",
+        color: "rgb(148, 209, 230)",
     },
     height: "650px"
 }

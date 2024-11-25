@@ -119,28 +119,3 @@
 #text-field {
     flex-grow: 1;
 }
-
-/* Navigation icon outlines */
-/* .vis-button {
-    background-color: blue;
-    color: blue;
-    outline-color: #0056b3;
-} */
-
-/* .vis-button, .vis-button * {
-    background-color: red !important;
-    color: red !important;
-    outline-color: red !important;
-    background-image: none;
-} */
-
-.vis-button {
-    background-color: lightblue !important;
-    background-image: none !important;
-    /* transition: box-shadow 0.3s ease;  */
-}
-
-.vis-button:hover {
-    background-color: rgb(149, 206, 225) !important;
-    box-shadow: 0 0 10px 3px blue !important;
-}
