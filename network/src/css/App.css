@@ -152,10 +152,10 @@ body {
 
   .headerButtons {
     max-width: 400px;
-    display: grid; /* Enable grid layout */
-    grid-template-columns: repeat(2, 1fr); /* 2 columns of equal width */
-    justify-items: center; /* Center items horizontally */
-    align-items: center; /* Center items vertically */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    align-items: center;
 
   }
 
