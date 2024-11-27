@@ -735,20 +735,6 @@ export const AppWrapper = ({children}) => {
                   }}> 
                 Add Organization
               </button>
-
-              <button class='undo' onClick={() => {
-                  //setPersonDialog(true);      // Open the "Add Person" dialog
-                  resetCanvasContextMenu();   // Reset the canvas context menu
-                  }}>
-                Undo
-              </button>
-
-              <button class='redo' onClick={() => {
-                  //setPersonDialog(true);      // Open the "Add Person" dialog
-                  resetCanvasContextMenu();   // Reset the canvas context menu
-                  }}>
-                Redo
-              </button>
             </div>
               <Graph
                   graph={state.graph}
