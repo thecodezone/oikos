@@ -128,7 +128,8 @@ body {
 .vis-network {
   /* Box shadow can be removed to hid div seam until fixed */
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7); 
-  max-height: 100vh !important;
+  max-height: 100vh;
+  min-height: 87vh; /* This is the height adjusted for the header height*/
 }
 
 /* Adjust for mobile screens */
@@ -148,6 +149,8 @@ body {
 
   canvas, .vis-network {
     max-height: 72vh !important;
+    min-height: none !important; /* This is the height adjusted for the header height*/
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7); 
   }
 
   .headerButtons {
