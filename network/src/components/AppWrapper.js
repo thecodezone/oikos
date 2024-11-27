@@ -775,10 +775,13 @@ export const AppWrapper = ({children}) => {
     
       if (existingElement) {
         const buttonContainer = document.createElement("div")
+        buttonContainer.classList = "headerButtons";
         buttonContainer.innerHTML = `
             <button class="addPerson">Add Person</button>
             <button class="addOrg">Add Organization</button>
-        `;
+            <button class="undo">Undo</button>
+            <button class="redo">Redo</button>
+        `;  // TODO: Add functionality to Undo & Redo
     
         const addPersonButton = buttonContainer.querySelector('.addPerson');
         const addOrgButton = buttonContainer.querySelector('.addOrg');

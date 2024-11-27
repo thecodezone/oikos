@@ -138,7 +138,7 @@ body {
   }
 
   #listHeader button  {
-    max-width: fit-content;
+    min-width: fit-content;
     font-size: 14px;
   }
 
@@ -148,5 +148,20 @@ body {
 
   canvas, .vis-network {
     max-height: 72vh !important;
+  }
+
+  .headerButtons {
+    max-width: 400px;
+    display: grid; /* Enable grid layout */
+    grid-template-columns: repeat(2, 1fr); /* 2 columns of equal width */
+    justify-items: center; /* Center items horizontally */
+    align-items: center; /* Center items vertically */
+
+  }
+
+  .headerButtons button {
+    min-width: 100px !important;
+    max-width: fit-content;
+    min-height: fit-content;
   }
 }
