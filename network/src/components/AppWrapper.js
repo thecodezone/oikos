@@ -736,13 +736,11 @@ export const AppWrapper = ({children}) => {
                 Add Organization
               </button>
               <button class='undo' onClick={() => {
-                  //setOrgDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
                   }}> 
                 Undo
               </button>
               <button class='redo' onClick={() => {
-                  //setOrgDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
                   }}> 
                 Redo
