@@ -149,7 +149,7 @@ body {
 
   canvas, .vis-network {
     max-height: 72vh !important;
-    min-height: none !important; /* This is the height adjusted for the header height*/
+    min-height: none !important;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7); 
   }
 
