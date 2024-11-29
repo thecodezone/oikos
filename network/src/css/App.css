@@ -35,3 +35,21 @@ body{
   width: 100px;
   text-align: center;
 }
+
+.undo{
+  margin: '5px'; 
+  background-color: #eac4d5; 
+  color: 'white'; 
+  font-size: 13px;
+  width: 100px;
+  text-align: center;
+}
+
+.redo{
+  margin: '5px'; 
+  background-color: #cc99ff; 
+  color: 'white'; 
+  font-size: 13px;
+  width: 100px;
+  text-align: center;
+}

@@ -735,6 +735,16 @@ export const AppWrapper = ({children}) => {
                   }}> 
                 Add Organization
               </button>
+              <button class='undo' onClick={() => {
+                  resetCanvasContextMenu();   // Reset the canvas context menu
+                  }}> 
+                Undo
+              </button>
+              <button class='redo' onClick={() => {
+                  resetCanvasContextMenu();   // Reset the canvas context menu
+                  }}> 
+                Redo
+              </button>
             </div>
               <Graph
                   graph={state.graph}
