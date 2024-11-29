@@ -1,41 +1,174 @@
-body{
-  background-color: black;
+
+/* Add or remove '--94D1E6' to chnage colors */
+:root {
+  --arrow-url-path:   url('../../img/arrow-94D1E6.png');
+  --zoomIn-url-path:   url('../../img/plus-94D1E6.png');
+  --zoomOut-url-path: url('../../img/minus-94D1E6.png');
+  --reset-url-path:   url('../../img/reset-94D1E6.png');
+}
+
+body {
+  background-color: rgb(47, 54, 61);
 }
 
 .container{
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }
 
-.header{
+.header {
+  text-align: center;
   color: white;
   cursor: default;
 }
 
-.addPerson{
-  background-color: #ff9770 ;
-  margin: '5px';  
-  color: 'white';
-  font-size: 13px;
-  width: 100px;
-  text-align: center;
-  position: relative;
-  bottom: 100px;
-  left: 100px;
+#listHeader {
+  display: flex;
+  flex-direction: row; 
+  align-items: center; 
+  justify-content: center; 
+  background-color: lightgrey;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7); 
 
+}
+
+#listHeader button {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-right: 5px !important;
+  margin-left: 5px !important;
+  opacity: 1;
+  font-family: Arial, sans-serif;
+  background: none;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid white;
+  color: white;
+  background-color: rgb(47, 54, 61);
+  height: 32px;
+  font-size: 16px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+  padding-left: 10px;
+  padding-right: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#listHeader button:hover {
+  background-color: rgba(47, 54, 61, 0.5);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.addPerson{
+  background-color: #ff9770 ;  
+  color: 'white';
+  text-align: center;
 }
 
 .addOrg{
-  margin: '5px'; 
   background-color: #9EE09E; 
   color: 'white'; 
-  font-size: 13px;
-  width: 100px;
   text-align: center;
 }
 
+/* Navigation buttons */
+.vis-button {
+  background-color: rgb(148, 209, 230) !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 88%;
+  transition: box-shadow 0.2s ease; 
+}
+
+.vis-button:hover {
+  box-shadow: 0 0 8px 3px lightblue !important;
+}
+
+.vis-zoomExtends {
+  background-image: var(--reset-url-path) !important;
+}
+
+.vis-zoomIn {
+  background-image: var(--zoomIn-url-path) !important;
+}
+
+.vis-zoomOut {
+  background-image: var(--zoomOut-url-path) !important;
+}
+
+.vis-up {
+  background-image: var(--arrow-url-path) !important;
+  transform: rotate(270deg); 
+}
+
+.vis-down {
+  background-image: var(--arrow-url-path) !important;
+  transform: rotate(90deg); 
+}
+
+.vis-left {
+  background-image: var(--arrow-url-path) !important;
+  transform: rotate(180deg); 
+}
+
+.vis-right {
+  background-image: var(--arrow-url-path) !important;
+}
+
+.container > div:nth-child(1) {
+  height: auto !important;
+}
+
+.container {
+  max-height: fit-content !important;
+}
+
+.vis-network {
+  /* Box shadow can be removed to hid div seam until fixed */
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7); 
+  max-height: 100vh;
+  min-height: 87vh; /* This is the height adjusted for the header height*/
+}
+
+/* Adjust for mobile screens */
+@media (max-width: 768px) {
+  body {
+    overflow: hidden;
+  }
+
+  #listHeader button  {
+    min-width: fit-content;
+    font-size: 14px;
+  }
+
+  .header {
+    font-size: 24px;
+  }
+
+  canvas, .vis-network {
+    max-height: 72vh !important;
+    min-height: none !important;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7); 
+  }
+
+  .headerButtons {
+    max-width: 400px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    align-items: center;
+
+  }
+
+  .headerButtons button {
+    min-width: 100px !important;
+    max-width: fit-content;
+    min-height: fit-content;
+  }
+}
+  
 .undo{
   margin: '5px'; 
   background-color: #eac4d5; 
@@ -45,7 +178,7 @@ body{
   text-align: center;
 }
 
-.redo{
+.redo {
   margin: '5px'; 
   background-color: #cc99ff; 
   color: 'white'; 
