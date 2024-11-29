@@ -167,6 +167,7 @@ body {
     max-width: fit-content;
     min-height: fit-content;
   }
+}
   
 .undo{
   margin: '5px'; 
@@ -177,7 +178,7 @@ body {
   text-align: center;
 }
 
-.redo{
+.redo {
   margin: '5px'; 
   background-color: #cc99ff; 
   color: 'white'; 
