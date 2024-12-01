@@ -232,18 +232,20 @@ export const AppWrapper = ({children}) => {
     };
 
     const deleteNodes = (nodeIDs) => {
-      const updatedNodes = nodes.filter(node => !nodeIDs.includes(node.id));  // filter out the selected nodes
-      const updatedEdges = edges.filter(edge => !nodeIDs.includes(edge.from) && !nodeIDs.includes(edge.to));  // filter related edges
-      setNodes(updatedNodes);
-      setEdges(updatedEdges);
-      setState(prevState => ({
-        ...prevState,
-        graph: {
-          nodes: updatedNodes,
-          edges: updatedEdges
-        }
-      }));
-      ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
+      if(window.confirm("Are you sure you want to delete node(s)?")){
+        const updatedNodes = nodes.filter(node => !nodeIDs.includes(node.id));  // filter out the selected nodes
+        const updatedEdges = edges.filter(edge => !nodeIDs.includes(edge.from) && !nodeIDs.includes(edge.to));  // filter related edges
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+        setState(prevState => ({
+          ...prevState,
+          graph: {
+            nodes: updatedNodes,
+            edges: updatedEdges
+          }
+        }));
+        ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
+      }
     };
 
     const editOrganization = (name, description, website, request, reminder) => {
@@ -411,18 +413,20 @@ export const AppWrapper = ({children}) => {
     }
   
     const deleteNode = (nodeID) => {
-      const updatedNodes = nodes.filter(node => node.id !== nodeID);
-      const updatedEdges = edges.filter(edge => edge.from !== nodeID && edge.to !== nodeID);
-      setNodes(updatedNodes);
-      setEdges(updatedEdges);
-      setState(prevState => ({
-        ...prevState,
-        graph: {
-          nodes: updatedNodes,
-          edges: updatedEdges
-        }
-      }));
-      ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
+      if(window.confirm("Are you sure you want to delete this node?")){
+        const updatedNodes = nodes.filter(node => node.id !== nodeID);
+        const updatedEdges = edges.filter(edge => edge.from !== nodeID && edge.to !== nodeID);
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+        setState(prevState => ({
+          ...prevState,
+          graph: {
+            nodes: updatedNodes,
+            edges: updatedEdges
+          }
+        }));
+        ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
+      }
     };
 
     const deleteEdge = (edgeID) => {
