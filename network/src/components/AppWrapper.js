@@ -150,7 +150,9 @@ export const AppWrapper = ({children}) => {
         const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
+        nodes.push(personEntry)
         setNodes(arrayCopy);
+        console.log(nodes);
       }
       else
       {
@@ -230,18 +232,20 @@ export const AppWrapper = ({children}) => {
     };
 
     const deleteNodes = (nodeIDs) => {
-      const updatedNodes = nodes.filter(node => !nodeIDs.includes(node.id));  // filter out the selected nodes
-      const updatedEdges = edges.filter(edge => !nodeIDs.includes(edge.from) && !nodeIDs.includes(edge.to));  // filter related edges
-      setNodes(updatedNodes);
-      setEdges(updatedEdges);
-      setState(prevState => ({
-        ...prevState,
-        graph: {
-          nodes: updatedNodes,
-          edges: updatedEdges
-        }
-      }));
-      ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
+      if(window.confirm("Are you sure you want to delete node(s)?")){
+        const updatedNodes = nodes.filter(node => !nodeIDs.includes(node.id));  // filter out the selected nodes
+        const updatedEdges = edges.filter(edge => !nodeIDs.includes(edge.from) && !nodeIDs.includes(edge.to));  // filter related edges
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+        setState(prevState => ({
+          ...prevState,
+          graph: {
+            nodes: updatedNodes,
+            edges: updatedEdges
+          }
+        }));
+        ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
+      }
     };
 
     const editOrganization = (name, description, website, request, reminder) => {
@@ -307,7 +311,15 @@ export const AppWrapper = ({children}) => {
               // Assuming event contains the nodeId that was clicked
               const nodeId = event.nodes[0]; // event.nodes is an array of clicked node IDs
               if (nodeId) {
+                handleSetNodeClicked(event);
                 handleNodeClick(nodeId);  // Call the multi-selection handler
+                handleCanvasOnContextMenu(true);
+                if (isCtrlPressedRef.current) {
+                  updateColor(nodeId, "rgb(200, 241, 255)");
+                } else {
+                  resetNodeColors("rgb(148, 209, 230)");
+                  updateColor(nodeId, "rgb(200, 241, 255)");
+                }
               }
             },
             doubleClick: ({ pointer: { canvas } }) => {
@@ -401,18 +413,20 @@ export const AppWrapper = ({children}) => {
     }
   
     const deleteNode = (nodeID) => {
-      const updatedNodes = nodes.filter(node => node.id !== nodeID);
-      const updatedEdges = edges.filter(edge => edge.from !== nodeID && edge.to !== nodeID);
-      setNodes(updatedNodes);
-      setEdges(updatedEdges);
-      setState(prevState => ({
-        ...prevState,
-        graph: {
-          nodes: updatedNodes,
-          edges: updatedEdges
-        }
-      }));
-      ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
+      if(window.confirm("Are you sure you want to delete this node?")){
+        const updatedNodes = nodes.filter(node => node.id !== nodeID);
+        const updatedEdges = edges.filter(edge => edge.from !== nodeID && edge.to !== nodeID);
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+        setState(prevState => ({
+          ...prevState,
+          graph: {
+            nodes: updatedNodes,
+            edges: updatedEdges
+          }
+        }));
+        ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
+      }
     };
 
     const deleteEdge = (edgeID) => {
@@ -477,6 +491,9 @@ export const AppWrapper = ({children}) => {
     const [canvasContextMenu, setCanvasContextMenu] = useState({
       toggled: false
     })
+    const [nodeClicked, setNodeClicked] = useState({
+      toggled: false
+    })
 
     function handleNodeOnContextMenu(e) {
       setNodeContextMenu({
@@ -494,6 +511,19 @@ export const AppWrapper = ({children}) => {
       setCanvasContextMenu({
         toggled: true
       })
+    }
+
+    function handleSetNodeClicked(e) {
+      setNodeClicked({
+        toggled: true
+      })
+    }
+
+    function resetNodeColors(color) {
+      const nodeIds = nodes.map(node => node.id);
+      nodeIds.forEach(id => {
+        updateColor(id, color);
+      });
     }
 
     function resetPoints() {
@@ -521,8 +551,15 @@ export const AppWrapper = ({children}) => {
       })
     }
 
+    function resetsetNodeClicked() {
+      setNodeClicked({
+        toggled: false
+      })
+    }
+
     useEffect(() => {
       function handler(e) {
+        resetsetNodeClicked();
         resetPoints()
         if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
           if (nodeContextMenu.toggled) {
@@ -536,6 +573,12 @@ export const AppWrapper = ({children}) => {
           else if (canvasContextMenu.toggled) {
               console.log('resetting canvas context menu')
               resetCanvasContextMenu()
+          }
+          if (!nodeClicked.toggled) {
+            console.log("YOU CLICKED OFF A NODE")
+            resetNodeColors("rgb(148, 209, 230)");
+          } else {
+            console.log("YOU CLICKED ON A NODE")
           }
         }
       }
@@ -579,12 +622,33 @@ export const AppWrapper = ({children}) => {
       console.log("properties dialog closed.")
     }
 
-    const updateColor = (node, color) =>{
-      node.color = color;
-      const newNode = {id: node.id, label: node.label, shape: node.shape, color: node.color, nodeInfo: node.nodeInfo}
-      console.log(state.graph.nodes);
-      return newNode
-    }
+    const updateColor = (nodeId, color) => {
+      const node = nodes.find((n) => n.id === nodeId);
+  
+      if (node) {
+          const updatedNode = {
+              ...node,
+              color: color,
+          };
+  
+          // Log to see the nodes
+          // console.log(state.graph.nodes);
+  
+          setState((prevState) => {
+              const updatedNodes = prevState.graph.nodes.map((n) =>
+                  n.id === nodeId ? updatedNode : n
+              );
+  
+              return {
+                  ...prevState,
+                  graph: {
+                      ...prevState.graph,
+                      nodes: updatedNodes,
+                  },
+              };
+          });
+        }
+      };
 
     const updateShape = (node, shape) => {
       node.shape = shape;
@@ -685,6 +749,10 @@ export const AppWrapper = ({children}) => {
     const isCtrlHeldDown = isCtrlPressedRef.current; 
     console.log('Ctrl pressed:', isCtrlHeldDown);
     console.log('Node clicked:', nodeId);
+    
+    const clickedNode = nodes.find(x => x.id === nodeId);
+    console.log(clickedNode);
+    console.log(clickedNode.nodeInfo);
 
     if (isCtrlHeldDown) {
       setSelectedNodes((prevSelectedNodes) => {
@@ -706,6 +774,42 @@ export const AppWrapper = ({children}) => {
     }
   };
 
+    useEffect(() => {
+      const existingElement = document.getElementById('listHeader');
+    
+      if (existingElement) {
+        const buttonContainer = document.createElement("div")
+        buttonContainer.classList = "headerButtons";
+        buttonContainer.innerHTML = `
+            <button class="addPerson">Add Person</button>
+            <button class="addOrg">Add Organization</button>
+            <button class="undo">Undo</button>
+            <button class="redo">Redo</button>
+        `;  // TODO: Add functionality to Undo & Redo
+    
+        const addPersonButton = buttonContainer.querySelector('.addPerson');
+        const addOrgButton = buttonContainer.querySelector('.addOrg');
+    
+        addPersonButton.addEventListener('click', () => {
+          setPersonDialog(true); // Open the "Add Person" dialog
+          resetCanvasContextMenu(); // Reset the canvas context menu
+        });
+    
+        addOrgButton.addEventListener('click', () => {
+          setOrgDialog(true); // Open the "Add Organization" dialog
+          resetCanvasContextMenu(); // Reset the canvas context menu
+        });
+
+        existingElement.append(buttonContainer);
+        
+      } else {
+        console.log('Element not found');
+      }
+    }, []);
+  
+
+
+
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
                                       orgDialog, rightClickedNode, rightClickedEdge, propertiesDialog, 
@@ -719,7 +823,7 @@ export const AppWrapper = ({children}) => {
             onContextMenu={(e) => {
               e.preventDefault(); // prevent the default behaviour when right clicked
             }}>
-            <div className="button-container">
+            {/* <div className="button-container">
               <button class='addPerson' onClick={() => {
                   setPersonDialog(true);      // Open the "Add Person" dialog
                   resetCanvasContextMenu();   // Reset the canvas context menu
@@ -732,7 +836,7 @@ export const AppWrapper = ({children}) => {
                   }}> 
                 Add Organization
               </button>
-            </div>
+            </div> */}
               <Graph
                   graph={state.graph}
                   options={dynamicOptions}

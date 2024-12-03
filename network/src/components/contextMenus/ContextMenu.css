@@ -14,13 +14,15 @@
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
 
-.context-menu.active {
+/* this is the left click dropdown menu element */
+.context-menu.active { 
     visibility: visible;
     opacity: 1;
     display: flex;
     flex-direction: column;
 }
 
+/* this is the left click dropdown menu individual elements (each row) */
 .context-menu button {
     width: 100%;
     background-color: transparent;
@@ -116,8 +118,4 @@
 
 #text-field {
     flex-grow: 1;
-}
-
-#test {
-    background-color: #159A9C;
 }
