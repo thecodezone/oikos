@@ -1,4 +1,4 @@
-import {addNode, deleteNode, updateNode} from "./apiFunctions.js"
+import {addNode, deleteNode, updateNode, getAllDataFromTable, updateNodePos} from "./apiFunctions.js"
 import { Router } from "express";
 import dotenv from "dotenv";
 
@@ -45,6 +45,36 @@ app.post('/updateNode', (req, res) => {
     const tableName = process.env.PERSONS_TABLE_NAME;
     console.log(`:api-route /updateNode ${partition}, ${nodeID}, ${data}, ${tableName}`)
     updateNode(partition, nodeID, data, tableName).then(function (returnVal) {
+        console.log(":api-route /Returned " + returnVal);
+        res.json(returnVal);
+    });
+});
+
+app.get("/getAllNodes", async function (req, res) {
+    console.log(`:api-route /getAllNodes`)
+    getAllDataFromTable(process.env.PERSONS_TABLE_NAME).then(function (returnVal) {
+        console.log(":api-route /getAllNodes Returned " + returnVal);
+        res.json(returnVal);
+    });
+});
+
+app.get("/getAllEdges", async function (req, res) {
+    console.log(`:api-route /getAllEdges`)
+    getAllDataFromTable(process.env.EDGES_TABLE_NAME).then(function (returnVal) {
+        console.log(":api-route /getAllEdges Returned " + returnVal);
+        res.json(returnVal);
+    });
+});
+
+app.post('/updateNodePos', (req, res) => {
+    // TODO: Add schema validation
+    const partition = "Development"
+    const nodeID = req.body.nodeID;
+    const newX = req.body.newX;
+    const newY = req.body.newY;
+    const tableName = process.env.PERSONS_TABLE_NAME;
+    console.log(`:api-route /updateNodePos ${partition}, ${nodeID}, ${newX}, ${newY}, ${tableName}`)
+    updateNodePos(partition, nodeID, newX, newY, tableName).then(function (returnVal) {
         console.log(":api-route /Returned " + returnVal);
         res.json(returnVal);
     });

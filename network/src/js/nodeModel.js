@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export class nodeModel {
     constructor(name, request, reminder) {
-        this.id = uuidv4();
+        this.id = "blank";
         this.name = name;
         this.request = request;
         this.reminder = reminder;
@@ -11,6 +11,10 @@ export class nodeModel {
 
     getID() {
         return this.id;
+    }
+
+    setID(id) {
+        this.id = id;
     }
 
     getName() {
