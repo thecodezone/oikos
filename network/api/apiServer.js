@@ -20,3 +20,8 @@ const port = process.env.PORT || 3030;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+app.get('/api/updateNode', (req, res) => {
+    // ".../message" to test directly in browser
+    res.json({ message: 'Updating node' });
+});

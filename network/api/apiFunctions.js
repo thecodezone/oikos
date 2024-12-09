@@ -64,18 +64,47 @@ export async function deleteNode(partition, nodeID, tableName) {
     }
 }
 
-export async function updateNode(partition, nodeID, data, tableName) {
+export async function updateNode(partition, nodeID, data, tableName, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) {
     console.log(`updateNode ${partition}, ${nodeID}, ${data}, ${tableName}`);
     const updateExpression = "SET Key = :expressionValue";
     const expressionAttributeValues = {
     ":expressionValue": data, // data will be expanded to more keys and values later
     };
+    /*async function updateNodeInfoDB(nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) {
+      console.log("Sending To Server...")
+      const response = await fetch("/api/updateNodeInfo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nodeID: nodeID,
+          Name: newName,
+          Phone: newPhone,
+          newStatus: newStatus,
+          newRequest:  newRequest,
+          newReminder: newReminder,
+          newCustomFields: newCustomFields
+  
+        })
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
+    }*/
 
     const updateCommand = new clientDynamoLib.UpdateCommand({
         TableName: tableName,
         Key: {
             Partition: partition,
-            NodeID: nodeID
+            NodeID: nodeID,
+            Name: newName,
+            Phone: newPhone,
+            newStatus: newStatus,
+            newRequest:  newRequest,
+            newReminder: newReminder,
+            newCustomFields: newCustomFields
         },
         UpdateExpression: updateExpression,
         ExpressionAttributeValues: expressionAttributeValues,

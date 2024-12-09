@@ -159,10 +159,10 @@ export const AppWrapper = ({children}) => {
           currentPerson.setCustomFields(customFields); // Save the custom fields
   
           console.log(currentPerson.getName());
-          let nodeId = currentPerson.getID();
+          //let nodeId = currentPerson.getID();
 //come here
-          console.log(`Node ID: ${nodeId}, New Name: ${name}, New Phone: ${phone}, New Status: ${status}, New Request: ${request}, New Reminder: ${reminder}, New Custom Fields: ${customFields}`);
-          updateNodeInfoDB(nodeId, name, phone, status, request, reminder, customFields);
+          //console.log(`Node ID: ${nodeId}, New Name: ${name}, New Phone: ${phone}, New Status: ${status}, New Request: ${request}, New Reminder: ${reminder}, New Custom Fields: ${customFields}`);
+          //updateNodeInfoDB(nodeId, name, phone, status, request, reminder, customFields);
   
           
           const personEntry = {
@@ -890,7 +890,7 @@ export const AppWrapper = ({children}) => {
       );
     };
 
-    const updateNodeInfo = (nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) => {
+  /*  const updateNodeInfo = (nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) => {
       console.log("Updated Nodes"); 
       setNodes((prevNodes) =>
         prevNodes.map((node) =>
@@ -899,7 +899,7 @@ export const AppWrapper = ({children}) => {
             : node
         )
       );
-    };
+    };*/
 
     useEffect(() => {
       if (state.network) {
@@ -950,7 +950,7 @@ export const AppWrapper = ({children}) => {
       
       return jsonData;
     }
-    async function updateNodeInfoDB(nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) {
+    /*async function updateNodeInfoDB(nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) {
       console.log("Sending To Server...")
       const response = await fetch("/api/updateNodeInfo", {
         method: "POST",
@@ -972,7 +972,7 @@ export const AppWrapper = ({children}) => {
       const jsonData = await response.json();
       
       return jsonData;
-    }
+    }*/
 
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,
