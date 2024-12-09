@@ -110,7 +110,33 @@ export const AppWrapper = ({children}) => {
     })
 
     // methods
-    const addPerson = (name, phone, status, request, reminder, customFields, id) => {
+    const addPerson = (name, phone, status, request, reminder, customFields) => {
+      console.log("PERSON ADDED")
+      if (name !== '' && status !== '')
+      {
+        name = adjustDuplicateName(name);
+        let nodeShape = "box"
+        if (status === 'believer')
+        {
+            nodeShape = "circle"
+        }
+        const id = uuidv4();
+        const newPerson = new Person(name, phone, status, request, reminder, customFields)
+        const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
+        const arrayCopy = [...nodes]; //creating a copy
+        arrayCopy.push(personEntry);
+        nodes.push(personEntry)
+        setNodes(arrayCopy);
+        sendNodeToServer(personEntry, name);
+        console.log(nodes);
+      }
+      else
+      {
+        ToastQueue.negative('Missing required fields.', {timeout:1500});
+      }
+    };
+
+    const populatePerson = (name, phone, status, request, reminder, customFields, id) => {
       console.log("PERSON ADDED")
       if (name !== '' && status !== '')
       {
@@ -127,7 +153,6 @@ export const AppWrapper = ({children}) => {
         arrayCopy.push(personEntry);
         nodes.push(personEntry)
         setNodes(arrayCopy);
-        sendNodeToServer(JSON.stringify(personEntry), name);
         console.log(nodes);
       }
       else
@@ -225,6 +250,7 @@ export const AppWrapper = ({children}) => {
     };
 
     async function sendNodeToServer(jsonString, nodeName) {
+      console.log(jsonString)
       console.log("calling sendNodeToServer function with string: " + jsonString);
       const response = await fetch('http://localhost:3030/api/addNode', {
           method: "POST",
@@ -232,7 +258,9 @@ export const AppWrapper = ({children}) => {
               'Accept': 'application/json',
               'Content-Type': 'application/json'
           },
-          body: jsonString
+          body: JSON.stringify(
+
+          )
       });
       console.log("Response received");
       const theData = await response.json();
@@ -864,7 +892,7 @@ export const AppWrapper = ({children}) => {
 
     async function populateNodesInUI(jsonData) {
       for (let node of jsonData.Nodes) {
-        addPerson(node.Name, node.Phone, node.Status, node.Request, node.Reminder, node.customFields, node.NodeID);
+        populatePerson(node.Name, node.Phone, node.Status, node.Request, node.Reminder, node.customFields, node.NodeID);
         // reset color to update is needed for this to work (unknown as to why)
         resetNodeColors("rgb(148, 209, 230)");
       }
