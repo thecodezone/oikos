@@ -17,10 +17,8 @@ app.post('/addNode', (req, res) => {
     console.log(req.body)
     // TODO: Add schema validation
     const partition = "Development" // TODO: Later will be implemented as a user
-    const nodeID = req.body.id;
-    console.log(req.body);
-    const data = req.body.nodeInfo;
-    console.log(JSON.stringify("data is " + JSON.stringify(data)));
+    const nodeID = req.body.data.id;
+    const data = req.body.data.nodeInfo;
     const tableName = process.env.PERSONS_TABLE_NAME;
     console.log(`:api-route /addNode ${partition}, ${nodeID}, ${data}, ${tableName}`)
     addNode(partition, nodeID, data, tableName).then(function (returnVal) {

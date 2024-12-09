@@ -17,7 +17,7 @@ export async function addNode(partition, nodeID, data, tableName) {
             Status: data.status, 
             Request: data.request, 
             Reminder: data.reminder, 
-            CustomFields: data.customField,
+            CustomFields: data.customFields,
             Position: {X: 0, Y: 0}
         },
     });
