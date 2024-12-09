@@ -122,6 +122,7 @@ export const AppWrapper = ({children}) => {
         }
         const id = uuidv4();
         const newPerson = new Person(name, phone, status, request, reminder, customFields)
+        newPerson.setID(id);
         const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
