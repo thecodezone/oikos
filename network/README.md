@@ -14,6 +14,15 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
+NOTE: If you are using this method, you will also need to open another terminal and run the api Node.js server by running `nodemon apiServer.js` in the `api` folder. Alternatively, use [npm run dual-start](#npm-run-dual-start) to automatically run the api server upon application launch
+
+### `npm run dual-start`
+In the `network` folder, run this command in a terminal to launch both the React app and the Node.js api server. 
+
+```bash
+npm run dual-start
+```
+
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.\

@@ -21,10 +21,12 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently \"react-scripts start\" \"cd api && nodemon apiServer.js\"",
+    "dual-start": "concurrently \"react-scripts start\" \"cd api && nodemon apiServer.js\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -47,5 +49,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy":"http://localhost:3030"
+  "proxy": "http://localhost:3030"
 }

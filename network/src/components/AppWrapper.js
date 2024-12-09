@@ -951,7 +951,7 @@ export const AppWrapper = ({children}) => {
         )
       );
     };
-
+  
     useEffect(() => {
       if (state.network) {
         const handleDragEnd = (event) => {
