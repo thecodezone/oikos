@@ -13,6 +13,8 @@ app.get('/testRoutes', (req, res) => {
 });
 
 app.post('/addNode', (req, res) => {
+    console.log("$$$$$$$$$$")
+    console.log(req.body)
     // TODO: Add schema validation
     const partition = "Development" // TODO: Later will be implemented as a user
     const nodeID = req.body.id;

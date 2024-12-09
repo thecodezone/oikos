@@ -251,17 +251,16 @@ export const AppWrapper = ({children}) => {
     };
 
     async function sendNodeToServer(jsonString, nodeName) {
-      console.log(jsonString)
       console.log("calling sendNodeToServer function with string: " + jsonString);
-      const response = await fetch('http://localhost:3030/api/addNode', {
+      const response = await fetch('/api/addNode', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify(
-
-          )
+          body: JSON.stringify({
+            data: jsonString
+          })
       });
       console.log("Response received");
       const theData = await response.json();
