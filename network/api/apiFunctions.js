@@ -17,7 +17,7 @@ export async function addNode(partition, nodeID, data, tableName) {
             Status: data.status, 
             Request: data.request, 
             Reminder: data.reminder, 
-            CustomFields: data.customFields,
+            customFields: data.customFields, // has to be lowercase for now
             Position: {X: 0, Y: 0}
         },
     });
@@ -34,6 +34,37 @@ export async function addNode(partition, nodeID, data, tableName) {
         const result = {
             "status": 900,
             "nodeID": nodeID
+        }
+        return result;
+    }
+};
+
+export async function addEdge(sourceID, targetID, label, tableName) {
+    console.log(`addEdge ${sourceID}, ${targetID}, ${label}, ${tableName}`);
+
+    const putCommand = new clientDynamoLib.PutCommand({
+        TableName: tableName,
+        Item: {
+            StartNode: sourceID,
+            RelationshipNode: targetID,
+            Relation: label
+        },
+    });
+    try {
+        await docClient.send(putCommand);
+        console.log("Edge added");
+        const result = {
+            "status": 100,
+            "StartNode": sourceID,
+            "RelationshipNode": targetID
+        }
+        return result;
+    } catch (err) {
+        console.log(err);
+        const result = {
+            "status": 900,
+            "StartNode": sourceID,
+            "RelationshipNode": targetID
         }
         return result;
     }

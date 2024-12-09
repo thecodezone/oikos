@@ -431,12 +431,32 @@ export const AppWrapper = ({children}) => {
             const arrayCopy = [...edges];
             arrayCopy.push(newEdge);
             setEdges(arrayCopy);
+            addEdgeToDB(sourceID, targetID, label);
             ToastQueue.positive('Successfully added link.', {timeout:1500});
         }
         else
         {
             ToastQueue.negative('Missing required fields.', {timeout:1500});
         }
+    }
+
+    async function addEdgeToDB(sourceID, targetID, label) {
+      console.log("Sending To Server...")
+      const response = await fetch("/api/addEdge", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          sourceID: sourceID,
+          targetID: targetID,
+          label: label
+        })
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
     }
 
     const addEdges = (edgeList) => {
