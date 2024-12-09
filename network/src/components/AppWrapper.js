@@ -159,7 +159,12 @@ export const AppWrapper = ({children}) => {
           currentPerson.setCustomFields(customFields); // Save the custom fields
   
           console.log(currentPerson.getName());
+          let nodeId = currentPerson.getID();
+//come here
+          console.log(`Node ID: ${nodeId}, New Name: ${name}, New Phone: ${phone}, New Status: ${status}, New Request: ${request}, New Reminder: ${reminder}, New Custom Fields: ${customFields}`);
+          updateNodeInfoDB(nodeId, name, phone, status, request, reminder, customFields);
   
+          
           const personEntry = {
               id: currentPerson.getID(),
               label: currentPerson.getName(),
@@ -820,6 +825,9 @@ export const AppWrapper = ({children}) => {
           nodeJsonData.Nodes.forEach(node => {
             updateNodePosition(node.NodeID, node.Position.X, node.Position.Y);
           });
+
+        
+          
         } catch (error) {
           console.error("Error fetching nodes or edges:", error);
         }
@@ -827,6 +835,7 @@ export const AppWrapper = ({children}) => {
     
       fetchData();
     }, []);
+    
 
     async function getAllNodeData() {
       console.log("Requesting data ...")
@@ -881,6 +890,17 @@ export const AppWrapper = ({children}) => {
       );
     };
 
+    const updateNodeInfo = (nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) => {
+      console.log("Updated Nodes"); 
+      setNodes((prevNodes) =>
+        prevNodes.map((node) =>
+          node.id === nodeID
+            ? { ...node, Name: newName, Phone: newPhone, Status: newStatus, Request: newRequest, Reminder: newReminder, customFields: newCustomFields, NodeID: nodeID }
+            : node
+        )
+      );
+    };
+
     useEffect(() => {
       if (state.network) {
         const handleDragEnd = (event) => {
@@ -923,6 +943,29 @@ export const AppWrapper = ({children}) => {
           nodeID: nodeID,
           newX: newX,
           newY: newY
+        })
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
+    }
+    async function updateNodeInfoDB(nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) {
+      console.log("Sending To Server...")
+      const response = await fetch("/api/updateNodeInfo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nodeID: nodeID,
+          Name: newName,
+          Phone: newPhone,
+          newStatus: newStatus,
+          newRequest:  newRequest,
+          newReminder: newReminder,
+          newCustomFields: newCustomFields
+  
         })
       });
       console.log("Response received")

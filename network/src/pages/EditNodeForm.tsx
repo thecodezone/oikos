@@ -211,6 +211,32 @@ function EditOrgDialog() {
     }
   }
 
+  /*async function updateNodeInfoDB(nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields, newSuggestedFields) {
+    console.log("Sending To Server...")
+    const response = await fetch("/api/updateNodeInfo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        nodeID: nodeID,
+        Name: newName,
+        Phone: newPhone,
+        newStatus: newStatus,
+        newRequest:  newRequest,
+        newReminder: newReminder,
+        newCustomFields: newCustomFields,
+        newSuggestedFields: newSuggestedFields
+
+      })
+    });
+    console.log("Response received")
+    const jsonData = await response.json();
+    
+    return jsonData;
+  }*/
+  
+
   function handleClose()
   {
     setName('');
