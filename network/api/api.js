@@ -1,4 +1,4 @@
-import {addNode, deleteNode, updateNode, getAllDataFromTable, updateNodePos} from "./apiFunctions.js"
+import {addNode, addEdge, deleteNode, updateNode, getAllDataFromTable, updateNodePos} from "./apiFunctions.js"
 import { Router } from "express";
 import dotenv from "dotenv";
 
@@ -15,11 +15,24 @@ app.get('/testRoutes', (req, res) => {
 app.post('/addNode', (req, res) => {
     // TODO: Add schema validation
     const partition = "Development" // TODO: Later will be implemented as a user
-    const nodeID = req.body.nodeID;
-    const data = req.body.data;
-    const tableName = process.env.TABLE_NAME;
+    const nodeID = req.body.data.id;
+    const data = req.body.data.nodeInfo;
+    const tableName = process.env.PERSONS_TABLE_NAME;
     console.log(`:api-route /addNode ${partition}, ${nodeID}, ${data}, ${tableName}`)
     addNode(partition, nodeID, data, tableName).then(function (returnVal) {
+        console.log(":api-route /Returned " + returnVal);
+        res.json(returnVal);
+    });
+});
+
+app.post('/addEdge', (req, res) => {
+    // TODO: Add schema validation
+    const sourceID = req.body.sourceID;
+    const targetID = req.body.targetID;
+    const label = req.body.label;
+    const tableName = process.env.EDGES_TABLE_NAME;
+    console.log(`:api-route /addEdge ${sourceID}, ${targetID}, ${label}, ${tableName}`)
+    addEdge(sourceID, targetID, label, tableName).then(function (returnVal) {
         console.log(":api-route /Returned " + returnVal);
         res.json(returnVal);
     });

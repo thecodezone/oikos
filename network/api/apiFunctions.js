@@ -12,7 +12,13 @@ export async function addNode(partition, nodeID, data, tableName) {
         Item: {
             Partition: partition,
             NodeID: nodeID,
-            Data: data, // data will be expanded to more keys and values later
+            Name: data.name,
+            Phone: data.phone, 
+            Status: data.status, 
+            Request: data.request, 
+            Reminder: data.reminder, 
+            customFields: data.customFields, // has to be lowercase for now
+            Position: {X: 0, Y: 0}
         },
     });
     try {
@@ -20,14 +26,45 @@ export async function addNode(partition, nodeID, data, tableName) {
         console.log("Node added");
         const result = {
             "status": 100,
-            "expID": nodeID
+            "nodeID": nodeID
         }
         return result;
     } catch (err) {
         console.log(err);
         const result = {
             "status": 900,
-            "expID": nodeID
+            "nodeID": nodeID
+        }
+        return result;
+    }
+};
+
+export async function addEdge(sourceID, targetID, label, tableName) {
+    console.log(`addEdge ${sourceID}, ${targetID}, ${label}, ${tableName}`);
+
+    const putCommand = new clientDynamoLib.PutCommand({
+        TableName: tableName,
+        Item: {
+            StartNode: sourceID,
+            RelationshipNode: targetID,
+            Relation: label
+        },
+    });
+    try {
+        await docClient.send(putCommand);
+        console.log("Edge added");
+        const result = {
+            "status": 100,
+            "StartNode": sourceID,
+            "RelationshipNode": targetID
+        }
+        return result;
+    } catch (err) {
+        console.log(err);
+        const result = {
+            "status": 900,
+            "StartNode": sourceID,
+            "RelationshipNode": targetID
         }
         return result;
     }

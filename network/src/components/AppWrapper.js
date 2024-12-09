@@ -110,7 +110,34 @@ export const AppWrapper = ({children}) => {
     })
 
     // methods
-    const addPerson = (name, phone, status, request, reminder, customFields, id) => {
+    const addPerson = (name, phone, status, request, reminder, customFields) => {
+      console.log("PERSON ADDED")
+      if (name !== '' && status !== '')
+      {
+        name = adjustDuplicateName(name);
+        let nodeShape = "box"
+        if (status === 'believer')
+        {
+            nodeShape = "circle"
+        }
+        const id = uuidv4();
+        const newPerson = new Person(name, phone, status, request, reminder, customFields)
+        newPerson.setID(id);
+        const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
+        const arrayCopy = [...nodes]; //creating a copy
+        arrayCopy.push(personEntry);
+        nodes.push(personEntry)
+        setNodes(arrayCopy);
+        sendNodeToServer(personEntry, name);
+        console.log(nodes);
+      }
+      else
+      {
+        ToastQueue.negative('Missing required fields.', {timeout:1500});
+      }
+    };
+
+    const populatePerson = (name, phone, status, request, reminder, customFields, id) => {
       console.log("PERSON ADDED")
       if (name !== '' && status !== '')
       {
@@ -222,6 +249,30 @@ export const AppWrapper = ({children}) => {
         ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
       }
     };
+
+    async function sendNodeToServer(jsonString, nodeName) {
+      console.log("calling sendNodeToServer function with string: " + jsonString);
+      const response = await fetch('/api/addNode', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            data: jsonString
+          })
+      });
+      console.log("Response received");
+      const theData = await response.json();
+      console.log('theData: ' + JSON.stringify(theData));
+      console.log("status: " + JSON.stringify(theData).status)
+      if (theData.status === 100){
+          console.log('Success', "'" + nodeName + "' node has been created.");
+      }
+      else{
+          console.log('Failure', "'" + nodeName + "' node was not created.");
+      }
+  }
 
     const editOrganization = (name, description, website, request, reminder) => {
         if (name !== '')
@@ -380,12 +431,32 @@ export const AppWrapper = ({children}) => {
             const arrayCopy = [...edges];
             arrayCopy.push(newEdge);
             setEdges(arrayCopy);
+            addEdgeToDB(sourceID, targetID, label);
             ToastQueue.positive('Successfully added link.', {timeout:1500});
         }
         else
         {
             ToastQueue.negative('Missing required fields.', {timeout:1500});
         }
+    }
+
+    async function addEdgeToDB(sourceID, targetID, label) {
+      console.log("Sending To Server...")
+      const response = await fetch("/api/addEdge", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          sourceID: sourceID,
+          targetID: targetID,
+          label: label
+        })
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
     }
 
     const addEdges = (edgeList) => {
@@ -841,7 +912,7 @@ export const AppWrapper = ({children}) => {
 
     async function populateNodesInUI(jsonData) {
       for (let node of jsonData.Nodes) {
-        addPerson(node.Name, node.Phone, node.Status, node.Request, node.Reminder, node.customFields, node.NodeID);
+        populatePerson(node.Name, node.Phone, node.Status, node.Request, node.Reminder, node.customFields, node.NodeID);
         // reset color to update is needed for this to work (unknown as to why)
         resetNodeColors("rgb(148, 209, 230)");
       }
@@ -880,7 +951,7 @@ export const AppWrapper = ({children}) => {
         )
       );
     };
-
+  
     useEffect(() => {
       if (state.network) {
         const handleDragEnd = (event) => {
