@@ -127,6 +127,7 @@ export const AppWrapper = ({children}) => {
         arrayCopy.push(personEntry);
         nodes.push(personEntry)
         setNodes(arrayCopy);
+        sendNodeToServer(JSON.stringify(personEntry), name);
         console.log(nodes);
       }
       else
@@ -222,6 +223,28 @@ export const AppWrapper = ({children}) => {
         ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
       }
     };
+
+    async function sendNodeToServer(jsonString, nodeName) {
+      console.log("calling sendNodeToServer function with string: " + jsonString);
+      const response = await fetch('http://localhost:3030/api/addNode', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: jsonString
+      });
+      console.log("Response received");
+      const theData = await response.json();
+      console.log('theData: ' + JSON.stringify(theData));
+      console.log("status: " + JSON.stringify(theData).status)
+      if (theData.status === 100){
+          console.log('Success', "'" + nodeName + "' node has been created.");
+      }
+      else{
+          console.log('Failure', "'" + nodeName + "' node was not created.");
+      }
+  }
 
     const editOrganization = (name, description, website, request, reminder) => {
         if (name !== '')
