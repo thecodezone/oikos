@@ -13,40 +13,13 @@ const AppContext = createContext()
 export const AppData = () => useContext(AppContext)
 
 export const AppWrapper = ({children}) => {
-  // hardcoded fillers for the example nodes
-  const jayden = new Person('Jayden')
-  const ryan = new Person('Ryan')
-  const amanda = new Person('Amanda')
-  const steffanie = new Person('Steffanie')
-  const aaron = new Person('Aaron')
-  const malachi = new Person('Malachi')
-  const zach = new Person('Zach')
-  const aven = new Person('Aven')
-  const bitty = new Person('Bitty')
-  const joya = new Person('Joya')
   // nodes, edges, and state
+    // Note: These are empty, but they are required. Do not remove.
     const [nodes, setNodes] = useState([
-        {id: jayden.getID(), label: "Jayden", shape: "circle", nodeInfo: jayden},
-        {id: ryan.getID(), label: "Ryan", shape: "box", nodeInfo: ryan},
-        {id: amanda.getID(), label: "Amanda", shape: "box", nodeInfo: amanda},
-        {id: steffanie.getID(), label: "Steffanie", shape: "circle", nodeInfo: steffanie},
-        {id: aaron.getID(), label: "Aaron", shape: "circle", nodeInfo: aaron},
-        {id: malachi.getID(), label: "Malachi", shape: "circle", nodeInfo: malachi},
-        {id: zach.getID(), label: "Zach", shape: "circle", nodeInfo: zach},
-        {id: aven.getID(), label: "Aven", shape: "box", nodeInfo: aven},
-        {id: bitty.getID(), label: "Bitty", shape: "box", nodeInfo: bitty},
-        {id: joya.getID(), label: "Joya", shape: "box", nodeInfo: joya}
+        
     ])
     const [edges, setEdges] = useState([
-        {id: 1, from: jayden.getID(), to: ryan.getID(), label: "Uncle"},
-        {id: 2, from: ryan.getID(), to: amanda.getID(), label: "Wife"},
-        {id: 3, from: jayden.getID(), to: steffanie.getID(), label: "Mother"},
-        {id: 4, from: jayden.getID(), to: aaron.getID(), label: "Friend"},
-        {id: 5, from: jayden.getID(), to: malachi.getID(), label: "Friend"},
-        {id: 6, from: jayden.getID(), to: zach.getID(), label: "Friend"},
-        {id: 7, from: amanda.getID(), to: aven.getID(), label: "Child"},
-        {id: 8, from: amanda.getID(), to: bitty.getID(), label: "Child"},
-        {id: 9, from: steffanie.getID(), to: joya.getID(), label: "Friend"}
+        
     ])
 
     const [isCtrlPressed, setIsCtrlPressed] = useState(false);
@@ -138,6 +111,34 @@ export const AppWrapper = ({children}) => {
 
     // methods
     const addPerson = (name, phone, status, request, reminder, customFields) => {
+      console.log("PERSON ADDED")
+      if (name !== '' && status !== '')
+      {
+        name = adjustDuplicateName(name);
+        let nodeShape = "box"
+        if (status === 'believer')
+        {
+            nodeShape = "circle"
+        }
+        const id = uuidv4();
+        const newPerson = new Person(name, phone, status, request, reminder, customFields)
+        newPerson.setID(id);
+        const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
+        const arrayCopy = [...nodes]; //creating a copy
+        arrayCopy.push(personEntry);
+        nodes.push(personEntry)
+        setNodes(arrayCopy);
+        sendNodeToServer(personEntry, name);
+        console.log(nodes);
+      }
+      else
+      {
+        ToastQueue.negative('Missing required fields.', {timeout:1500});
+      }
+    };
+
+    const populatePerson = (name, phone, status, request, reminder, customFields, id) => {
+      console.log("PERSON ADDED")
       if (name !== '' && status !== '')
       {
         name = adjustDuplicateName(name);
@@ -147,6 +148,7 @@ export const AppWrapper = ({children}) => {
             nodeShape = "circle"
         }
         const newPerson = new Person(name, phone, status, request, reminder, customFields)
+        newPerson.setID(id);
         const personEntry = {id: newPerson.getID(), label: name, shape: nodeShape, nodeInfo: newPerson};
         const arrayCopy = [...nodes]; //creating a copy
         arrayCopy.push(personEntry);
@@ -247,6 +249,30 @@ export const AppWrapper = ({children}) => {
         ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
       }
     };
+
+    async function sendNodeToServer(jsonString, nodeName) {
+      console.log("calling sendNodeToServer function with string: " + jsonString);
+      const response = await fetch('/api/addNode', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            data: jsonString
+          })
+      });
+      console.log("Response received");
+      const theData = await response.json();
+      console.log('theData: ' + JSON.stringify(theData));
+      console.log("status: " + JSON.stringify(theData).status)
+      if (theData.status === 100){
+          console.log('Success', "'" + nodeName + "' node has been created.");
+      }
+      else{
+          console.log('Failure', "'" + nodeName + "' node was not created.");
+      }
+  }
 
     const editOrganization = (name, description, website, request, reminder) => {
         if (name !== '')
@@ -388,6 +414,7 @@ export const AppWrapper = ({children}) => {
     }, [nodes,edges]);
   
     const addEdge = (sourceID, targetID, label) => {
+      console.log("EDGE ADDED");
         if (sourceID !== null && targetID !== null && label !== '')
         {
             for (let i = 0; i<edges.length; i++)
@@ -404,6 +431,7 @@ export const AppWrapper = ({children}) => {
             const arrayCopy = [...edges];
             arrayCopy.push(newEdge);
             setEdges(arrayCopy);
+            addEdgeToDB(sourceID, targetID, label);
             ToastQueue.positive('Successfully added link.', {timeout:1500});
         }
         else
@@ -411,6 +439,50 @@ export const AppWrapper = ({children}) => {
             ToastQueue.negative('Missing required fields.', {timeout:1500});
         }
     }
+
+    async function addEdgeToDB(sourceID, targetID, label) {
+      console.log("Sending To Server...")
+      const response = await fetch("/api/addEdge", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          sourceID: sourceID,
+          targetID: targetID,
+          label: label
+        })
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
+    }
+
+    const addEdges = (edgeList) => {
+      const newEdges = [...edges];
+  
+      for (let { sourceID, targetID, label } of edgeList) {
+          if (sourceID !== null && targetID !== null && label !== '') {
+              const exists = edges.some(edge => edge.from === sourceID && edge.to === targetID);
+              if (exists) {
+                  ToastQueue.info(`Edge from ${nodes.find(x => x.id === sourceID).label} to ${nodes.find(x => x.id === targetID).label} already exists.`, { timeout: 1500 });
+                  continue;
+              }
+              const newEdge = { id: uuidv4(), from: sourceID, to: targetID, label: label };
+              newEdges.push(newEdge);
+          } else {
+              ToastQueue.negative('Missing required fields.', { timeout: 1500 });
+          }
+      }
+  
+      setEdges(newEdges);
+  
+      if (newEdges.length > edges.length) {
+          ToastQueue.positive('Successfully added links.', { timeout: 1500 });
+      }
+  };
+  
   
     const deleteNode = (nodeID) => {
       if(window.confirm("Are you sure you want to delete this node?")){
@@ -806,9 +878,129 @@ export const AppWrapper = ({children}) => {
         console.log('Element not found');
       }
     }, []);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const nodeJsonData = await getAllNodeData();
+          populateNodesInUI(nodeJsonData);
+    
+          const edgeJsonData = await getAllEdgeData();
+          populateEdgesInUI(edgeJsonData);
+    
+          nodeJsonData.Nodes.forEach(node => {
+            updateNodePosition(node.NodeID, node.Position.X, node.Position.Y);
+          });
+        } catch (error) {
+          console.error("Error fetching nodes or edges:", error);
+        }
+      };
+    
+      fetchData();
+    }, []);
+
+    async function getAllNodeData() {
+      console.log("Requesting data ...")
+      const response = await fetch("/api/getAllNodes", {
+          method: "GET"
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
+    }
+
+    async function populateNodesInUI(jsonData) {
+      for (let node of jsonData.Nodes) {
+        populatePerson(node.Name, node.Phone, node.Status, node.Request, node.Reminder, node.customFields, node.NodeID);
+        // reset color to update is needed for this to work (unknown as to why)
+        resetNodeColors("rgb(148, 209, 230)");
+      }
+    }
+    
+    async function getAllEdgeData() {
+      console.log("Requesting data ...")
+      const response = await fetch("/api/getAllEdges", {
+          method: "GET"
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
+    }
   
+    function populateEdgesInUI(jsonData) {
+      const edgeList = [];
+      for (let item of jsonData.Nodes) {
+        edgeList.push({ 
+          sourceID: item.StartNode, 
+          targetID: item.RelationshipNode, 
+          label: item.Relation
+        });
+      }
+      addEdges(edgeList);
+    }
 
+    const updateNodePosition = (nodeId, newX, newY) => {
+      console.log("Positioned Nodes"); 
+      setNodes((prevNodes) =>
+        prevNodes.map((node) =>
+          node.id === nodeId
+            ? { ...node, x: newX, y: newY }
+            : node
+        )
+      );
+    };
+  
+    useEffect(() => {
+      if (state.network) {
+        const handleDragEnd = (event) => {
+          const { nodes } = event;
+          if (nodes.length > 0) {
+            const updatedPositions = state.network.getPositions(nodes);
 
+            nodes.forEach(async (nodeId) => {
+              const position = updatedPositions[nodeId];
+              // Logging for development
+              console.log(`Node ID: ${nodeId}, New X: ${position.x}, New Y: ${position.y}`);
+              await updateNodePosInDB(nodeId, position.x, position.y);
+            });
+
+            setNodes((prevNodes) =>
+              prevNodes.map((node) =>
+                nodes.includes(node.id)
+                  ? { ...node, x: updatedPositions[node.id].x, y: updatedPositions[node.id].y }
+                  : node
+              )
+            );
+          }
+        };
+    
+        state.network.on("dragEnd", handleDragEnd);
+        return () => {
+          state.network.off("dragEnd", handleDragEnd);
+        };
+      }
+    }, [state.network]);
+
+    async function updateNodePosInDB(nodeID, newX, newY) {
+      console.log("Sending To Server...")
+      const response = await fetch("/api/updateNodePos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nodeID: nodeID,
+          newX: newX,
+          newY: newY
+        })
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
+    }
 
     return (
         <AppContext.Provider value = {{state, nodes, edges, personDialog, editNodeDialog,

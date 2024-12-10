@@ -12,7 +12,13 @@ export async function addNode(partition, nodeID, data, tableName) {
         Item: {
             Partition: partition,
             NodeID: nodeID,
-            Data: data, // data will be expanded to more keys and values later
+            Name: data.name,
+            Phone: data.phone, 
+            Status: data.status, 
+            Request: data.request, 
+            Reminder: data.reminder, 
+            customFields: data.customFields, // has to be lowercase for now
+            Position: {X: 0, Y: 0}
         },
     });
     try {
@@ -20,14 +26,45 @@ export async function addNode(partition, nodeID, data, tableName) {
         console.log("Node added");
         const result = {
             "status": 100,
-            "expID": nodeID
+            "nodeID": nodeID
         }
         return result;
     } catch (err) {
         console.log(err);
         const result = {
             "status": 900,
-            "expID": nodeID
+            "nodeID": nodeID
+        }
+        return result;
+    }
+};
+
+export async function addEdge(sourceID, targetID, label, tableName) {
+    console.log(`addEdge ${sourceID}, ${targetID}, ${label}, ${tableName}`);
+
+    const putCommand = new clientDynamoLib.PutCommand({
+        TableName: tableName,
+        Item: {
+            StartNode: sourceID,
+            RelationshipNode: targetID,
+            Relation: label
+        },
+    });
+    try {
+        await docClient.send(putCommand);
+        console.log("Edge added");
+        const result = {
+            "status": 100,
+            "StartNode": sourceID,
+            "RelationshipNode": targetID
+        }
+        return result;
+    } catch (err) {
+        console.log(err);
+        const result = {
+            "status": 900,
+            "StartNode": sourceID,
+            "RelationshipNode": targetID
         }
         return result;
     }
@@ -96,6 +133,77 @@ export async function updateNode(partition, nodeID, data, tableName) {
         const result = {
             "status": 900,
             "NodeID": nodeID,
+        }
+        return result;
+    }
+}
+
+export async function getAllDataFromTable(tableName) {
+    console.log(`getAllDataFromTable ${tableName}`);
+
+    const selectItemStatementCommand = new clientDynamoLib.ExecuteStatementCommand({
+        Statement: `SELECT * FROM ` + `"` + tableName + `"`
+    });
+    try {
+        const selectItemResponse = await docClient.send(selectItemStatementCommand);
+        console.log("Data gotten");
+        const result = {
+            "status": 100,
+            "Nodes": selectItemResponse.Items
+        }
+        return result;
+    } catch (err) {
+        console.log(err);
+        const result = {
+            "status": 900
+        }
+        return result;
+    }
+};
+
+export async function updateNodePos(partition, nodeID, newX, newY, tableName) {
+    console.log(`\nupdateNodePos ${partition}, ${nodeID}, ${newX}, ${newY}, ${tableName}`);
+    const updateExpression = "SET #position.#x = :newX, #position.#y = :newY";
+    const expressionAttributeNames = {
+        "#position": "Position",
+        "#x": "X",
+        "#y": "Y",
+    };
+    const expressionAttributeValues = {
+        ":newX": newX,
+        ":newY": newY,
+    };
+
+    const updateCommand = new clientDynamoLib.UpdateCommand({
+        TableName: tableName,
+        Key: {
+            Partition: partition,
+            NodeID: nodeID
+        },
+        UpdateExpression: updateExpression,
+        ExpressionAttributeNames: expressionAttributeNames,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ReturnValues: "ALL_NEW"
+    });
+
+    try {
+        const response = await docClient.send(updateCommand);
+        console.log(`Node position updated successfully. Status: `, response.$metadata.httpStatusCode);
+        const result = {
+            "status": 100,
+            "NodeID": nodeID,
+            "Position.X": newX,
+            "Position.Y": newY
+        }
+        return result;
+
+    } catch (err) {
+        console.error("Error updating node position:", err);
+        const result = {
+            "status": 900,
+            "NodeID": nodeID,
+            "Position.X": newX,
+            "Position.Y": newY
         }
         return result;
     }
