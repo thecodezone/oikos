@@ -198,11 +198,23 @@ export const AppWrapper = ({children}) => {
               shape: nodeShape,
               nodeInfo: currentPerson
           };
+
+          const updatePerson = {
+              id: currentPerson.getID(),
+              name: currentPerson.getName(),
+              phone: currentPerson.getPhone(),
+              status: currentPerson.getStatus(),
+              request: currentPerson.getRequest(),
+              reminder: currentPerson.getReminder(),
+              customFields: currentPerson.getCustomFields()
+              
+          }
   
           // Update nodes array
           const arrayCopy = [...nodes]; // creating a copy
           let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode);
           arrayCopy[nodeIndex] = personEntry;
+          updateNodeToServer(updatePerson);
   
           setNodes(arrayCopy); // Update state with the modified node
           console.log(nodes);
@@ -278,6 +290,24 @@ export const AppWrapper = ({children}) => {
           console.log('Failure', "'" + nodeName + "' node was not created.");
       }
   }
+
+  async function updateNodeToServer(jsonString) {
+    console.log("calling updateNodeToServer function with string: " + jsonString);
+    const response = await fetch('/api/updateNode', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          data: jsonString
+        })
+    });
+    console.log("Response received");
+    const theData = await response.json();
+    console.log('theData: ' + JSON.stringify(theData));
+    console.log("status: " + JSON.stringify(theData).status)
+}
 
     const editOrganization = (name, description, website, request, reminder) => {
         if (name !== '')
@@ -885,7 +915,19 @@ export const AppWrapper = ({children}) => {
     }, []);
 
     useEffect(() => {
+      const currentPerson = nodes.find(x => x.id === rightClickedNode).nodeInfo;
       const fetchData = async () => {
+        
+        const updatePerson = {
+          id: currentPerson.getID(),
+          name: currentPerson.getName(),
+          phone: currentPerson.getPhone(),
+          status: currentPerson.getStatus(),
+          request: currentPerson.getRequest(),
+          reminder: currentPerson.getReminder(),
+          customFields: currentPerson.getCustomFields()
+          
+      }
         try {
           const nodeJsonData = await getAllNodeData();
           populateNodesInUI(nodeJsonData);
@@ -895,6 +937,8 @@ export const AppWrapper = ({children}) => {
     
           nodeJsonData.Nodes.forEach(node => {
             updateNodePosition(node.NodeID, node.Position.X, node.Position.Y);
+    //comehere
+            updateNodeToServer(updatePerson);
           });
 
         
@@ -924,6 +968,12 @@ export const AppWrapper = ({children}) => {
         populatePerson(node.Name, node.Phone, node.Status, node.Request, node.Reminder, node.customFields, node.NodeID);
         // reset color to update is needed for this to work (unknown as to why)
         resetNodeColors("rgb(148, 209, 230)");
+      }
+    }
+
+    async function upateNodesInUI(jsonData) {
+      for (let node of jsonData.Nodes) {
+        editPerson(node.Name, node.Phone, node.Status, node.Request, node.Reminder, node.customFields, node.NodeID);
       }
     }
     
