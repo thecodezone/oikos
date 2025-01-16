@@ -42,7 +42,7 @@ app.post('/addEdge', (req, res) => {
 app.post("/deleteNode", async function (req, res) {
     // TODO: Add schema validation
     const partition = "Development" // TODO: Later will be implemented as a user
-    const nodeID = req.body.nodeID;
+    const nodeID = req.body.NodeID;
     const tableName = process.env.TABLE_NAME;
     console.log(`:api-route /deleteNode ${partition}, ${nodeID}`)
     deleteNode(partition, nodeID, tableName).then(async function (returnVal) {
@@ -54,7 +54,7 @@ app.post("/deleteNode", async function (req, res) {
 app.post('/updateNode', (req, res) => {
     // TODO: Add schema validation
     const partition = "Development" // TODO: Later will be implemented as a user
-    const nodeID = req.body.nodeID;
+    const nodeID = req.body.NodeID;
     const data = req.body;
     console.log("data is: " + data);
     
