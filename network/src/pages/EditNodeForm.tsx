@@ -87,6 +87,32 @@ function EditPersonDialog() {
     setFields(fields.filter((_, i) => i !== index));
   }
 
+  async function updateNodeInfoDB(nodeID, newName, newPhone, newStatus, newRequest, newReminder, newCustomFields) {
+    console.log("Sending To Server...")
+    const response = await fetch("/api/updateNode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        NodeID: nodeID,
+        Name: newName,
+        Phone: newPhone,
+        Status: newStatus,
+        Request:  newRequest,
+        Reminder: newReminder,
+        customFields: newCustomFields
+
+      })
+    });
+    console.log("Response received")
+    
+    const jsonData = await response.json();
+    console.log("jsonData is: " + JSON.stringify(jsonData));
+
+    return jsonData;
+  }
+
   let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     currentPerson.setName(name);
@@ -96,10 +122,15 @@ function EditPersonDialog() {
     currentPerson.setReminder(reminder);
     currentPerson.setCustomFields([...customFields, ...suggestedFields]);
 
+    updateNodeInfoDB(currentPerson.getID(), name, phone, status, request, reminder, customFields);
+    console.log("called updateNodeInfoDB");
+
     const personEntry = { id: currentPerson.getID(), label: currentPerson.getName(), shape: "box", nodeInfo: currentPerson };
     const arrayCopy = [...nodes];
     let nodeIndex = nodes.findIndex(obj => obj.id === rightClickedNode);
     arrayCopy[nodeIndex] = personEntry;
+
+    
 
     handleClose();
     dialog.dismiss();

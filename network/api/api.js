@@ -55,7 +55,9 @@ app.post('/updateNode', (req, res) => {
     // TODO: Add schema validation
     const partition = "Development" // TODO: Later will be implemented as a user
     const nodeID = req.body.nodeID;
-    const data = req.body.data;
+    const data = req.body;
+    console.log("data is: " + data);
+    
     const tableName = process.env.PERSONS_TABLE_NAME;
     console.log(`:api-route /updateNode ${partition}, ${nodeID}, ${data}, ${tableName}`)
     updateNode(partition, nodeID, data, tableName).then(function (returnVal) {

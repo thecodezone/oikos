@@ -108,11 +108,22 @@ export async function updateNode(partition, nodeID, data, tableName) {
     ":expressionValue": data, // data will be expanded to more keys and values later
     };
 
+    console.log("Running updateNode - tableName = " + tableName);
+    console.log("data = " + JSON.stringify(data));
+
+    console.log(data.NodeID + " " + data.Name + " " + data.Phone+ " " + data.Status+ " " + data.Request+ " " +data.Reminder+ " " + data.customFields)
+
     const updateCommand = new clientDynamoLib.UpdateCommand({
         TableName: tableName,
         Key: {
             Partition: partition,
-            NodeID: nodeID
+            NodeID: data.NodeID,
+            Name: data.Name,
+            Phone: data.Phone,
+            Status: data.Status,
+            Request:  data.Request,
+            Reminder: data.Reminder,
+            customFields: data.customFields
         },
         UpdateExpression: updateExpression,
         ExpressionAttributeValues: expressionAttributeValues,
