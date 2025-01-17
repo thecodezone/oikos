@@ -143,7 +143,7 @@ export async function updateNode(partition, nodeID, data, tableName) {
         const response = await docClient.send(updateCommand);
         console.log("Node updated:", response);
         return {
-            status: 100,
+            status: 200,
             NodeID: nodeID,
         };
     } catch (err) {
