@@ -103,10 +103,29 @@ export async function deleteNode(partition, nodeID, tableName) {
 
 export async function updateNode(partition, nodeID, data, tableName) {
     console.log(`updateNode ${partition}, ${nodeID}, ${data}, ${tableName}`);
-    const updateExpression = "SET Key = :expressionValue";
+    console.log("Key object:", { PartitionKey: partition, NodeID: nodeID });
+    console.log("Expected partition key:", typeof partition);
+    console.log("Expected sort key:", typeof nodeID);
+    const updateExpression = "SET #name = :name, #phone = :phone, #status = :status, #request = :request, #reminder = :reminder, #customFields = :customFields";
     const expressionAttributeValues = {
-    ":expressionValue": data, // data will be expanded to more keys and values later
+        ":name": data.Name,
+        ":phone": data.Phone,
+        ":status": data.Status,
+        ":request": data.Request,
+        ":reminder": data.Reminder,
+        ":customFields": data.customFields
     };
+    const expressionAttributeNames = {
+        "#name": "Name",
+        "#phone": "Phone",
+        "#status": "Status",
+        "#request": "Request",
+        "#reminder": "Reminder",
+        "#customFields": "customFields"
+    };
+
+    console.log("Running updateNode - tableName = " + tableName);
+    console.log("data = " + JSON.stringify(data));
 
     const updateCommand = new clientDynamoLib.UpdateCommand({
         TableName: tableName,
@@ -116,25 +135,23 @@ export async function updateNode(partition, nodeID, data, tableName) {
         },
         UpdateExpression: updateExpression,
         ExpressionAttributeValues: expressionAttributeValues,
+        ExpressionAttributeNames: expressionAttributeNames,
         ReturnValues: "ALL_NEW"
     });
 
     try {
-        await docClient.send(updateCommand);
-        console.log("Node updated");
-        const result = {
-            "status": 100,
-            "NodeID": nodeID,
-        }
-        return result;
-
+        const response = await docClient.send(updateCommand);
+        console.log("Node updated:", response);
+        return {
+            status: 200,
+            NodeID: nodeID,
+        };
     } catch (err) {
-        console.log(err);
-        const result = {
-            "status": 900,
-            "NodeID": nodeID,
-        }
-        return result;
+        console.error("Error updating node:", err);
+        return {
+            status: 900,
+            NodeID: nodeID,
+        };
     }
 }
 
