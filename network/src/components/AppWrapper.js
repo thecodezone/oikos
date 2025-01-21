@@ -246,6 +246,9 @@ export const AppWrapper = ({children}) => {
             edges: updatedEdges
           }
         }));
+        for(let nodeID in nodeIDs){
+          deleteNodeFromDB(nodeID);
+        }
         ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
       }
     };
@@ -497,9 +500,27 @@ export const AppWrapper = ({children}) => {
             edges: updatedEdges
           }
         }));
+        deleteNodeFromDB(nodeID);
         ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
       }
     };
+
+    async function deleteNodeFromDB(nodeID) {
+      console.log("Sending To Server...")
+      const response = await fetch("/api/deleteNode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          NodeID: nodeID
+        })
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
+    }
 
     const deleteEdge = (edgeID) => {
       const updatedEdges = edges.filter(edge => edge.id !== edgeID);
