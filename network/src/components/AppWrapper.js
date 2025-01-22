@@ -548,6 +548,8 @@ export const AppWrapper = ({children}) => {
 
     const deleteEdge = (edgeID) => {
       const updatedEdges = edges.filter(edge => edge.id !== edgeID);
+      let edgesToDelete = edges.filter(edge => edge.id == edgeID);
+      console.log(edgesToDelete[0])
       setEdges(updatedEdges);
       setState(prevState => ({
         ...prevState,
@@ -557,6 +559,7 @@ export const AppWrapper = ({children}) => {
         }
       }));
       ToastQueue.positive('Edge deleted successfully.', {timeout: 1500});
+      deleteEdgeFromDB(edgesToDelete[0].from, edgesToDelete[0].to);
     };
 
     const editEdge = (targetID, label) => {

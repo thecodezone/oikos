@@ -1,5 +1,5 @@
 
-import {addNode, addEdge, deleteNode, updateNode, getAllDataFromTable, updateNodePos} from "./apiFunctions.js"
+import {addNode, addEdge, deleteNode, deleteEdge, updateNode, getAllDataFromTable, updateNodePos} from "./apiFunctions.js"
 import { Router } from "express";
 import dotenv from "dotenv";
 
