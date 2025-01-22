@@ -51,6 +51,18 @@ app.post("/deleteNode", async function (req, res) {
     });
 });
 
+app.post("/deleteEdge", async function (req, res) {
+    // TODO: Add schema validation
+    const sourceNode = req.body.sourceNode;
+    const targetNode = req.body.targetNode;
+    const tableName = process.env.EDGES_TABLE_NAME;
+    console.log(`:api-route /deleteEdge ${sourceNode}, ${targetNode}`)
+    deleteEdge(sourceNode, targetNode, tableName).then(async function (returnVal) {
+        console.log(":api-route /Returned " + returnVal);
+        res.json(returnVal);
+    });
+});
+
 app.post('/updateNode', (req, res) => {
     // TODO: Add schema validation
     const partition = "Development" // TODO: Later will be implemented as a user

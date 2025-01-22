@@ -237,6 +237,7 @@ export const AppWrapper = ({children}) => {
       if(window.confirm("Are you sure you want to delete node(s)?")){
         const updatedNodes = nodes.filter(node => !nodeIDs.includes(node.id));  // filter out the selected nodes
         const updatedEdges = edges.filter(edge => !nodeIDs.includes(edge.from) && !nodeIDs.includes(edge.to));  // filter related edges
+        let edgesToDelete = edges.filter(edge => nodeIDs.includes(edge.from) && nodeIDs.includes(edge.to));
         setNodes(updatedNodes);
         setEdges(updatedEdges);
         setState(prevState => ({
@@ -246,8 +247,12 @@ export const AppWrapper = ({children}) => {
             edges: updatedEdges
           }
         }));
-        for(let nodeID in nodeIDs){
-          deleteNodeFromDB(nodeID);
+        console.log(nodeIDs)
+        for(let ID in nodeIDs){
+          deleteNodeFromDB(nodeIDs[ID]);
+        }
+        for(let edge in edgesToDelete){
+          deleteEdgeFromDB(edgesToDelete[edge].from, edgesToDelete[edge].to);
         }
         ToastQueue.positive(`${nodeIDs.length} Node(s) deleted successfully.`, {timeout: 1500});
       }
@@ -489,6 +494,7 @@ export const AppWrapper = ({children}) => {
   
     const deleteNode = (nodeID) => {
       if(window.confirm("Are you sure you want to delete this node?")){
+        console.log(nodeID);
         const updatedNodes = nodes.filter(node => node.id !== nodeID);
         const updatedEdges = edges.filter(edge => edge.from !== nodeID && edge.to !== nodeID);
         setNodes(updatedNodes);
@@ -500,7 +506,6 @@ export const AppWrapper = ({children}) => {
             edges: updatedEdges
           }
         }));
-        console.log(nodeID);
         deleteNodeFromDB(nodeID);
         ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
       }
@@ -515,6 +520,24 @@ export const AppWrapper = ({children}) => {
         },
         body: JSON.stringify({
           NodeID: nodeID
+        })
+      });
+      console.log("Response received")
+      const jsonData = await response.json();
+      
+      return jsonData;
+    }
+
+    async function deleteEdgeFromDB(sourceNode, targetNode) {
+      console.log("Sending To Server...")
+      const response = await fetch("/api/deleteEdge", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          sourceNode: sourceNode,
+          targetNode: targetNode
         })
       });
       console.log("Response received")

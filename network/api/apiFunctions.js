@@ -101,6 +101,37 @@ export async function deleteNode(partition, nodeID, tableName) {
     }
 }
 
+export async function deleteEdge(sourceNode, targetNode, tableName) {
+    console.log(`deleteEdge ${sourceNode}, ${targetNode}, ${tableName}`);
+
+    const deleteCommand = new clientDynamoLib.DeleteCommand({
+        TableName: tableName,
+        Key: {
+            StartNode: `${sourceNode}`,
+            RelationshipNode: `${targetNode}`
+        },
+    });
+    try {
+        await docClient.send(deleteCommand);
+        console.log("Edge deleted");
+        const result = {
+            "status": 100,
+            "StartNode": sourceNode,
+            "RelationshipNode": targetNode,
+        }
+        return result;
+
+    } catch (err) {
+        console.log(err);
+        const result = {
+            "status": 900,
+            "StartNode": sourceNode,
+            "RelationshipNode": targetNode,
+        }
+        return result;
+    }
+}
+
 export async function updateNode(partition, nodeID, data, tableName) {
     console.log(`updateNode ${partition}, ${nodeID}, ${data}, ${tableName}`);
     console.log("Key object:", { PartitionKey: partition, NodeID: nodeID });
