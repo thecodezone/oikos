@@ -500,6 +500,7 @@ export const AppWrapper = ({children}) => {
             edges: updatedEdges
           }
         }));
+        console.log(nodeID);
         deleteNodeFromDB(nodeID);
         ToastQueue.positive('Node deleted successfully.', {timeout: 1500});
       }
